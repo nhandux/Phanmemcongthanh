@@ -1,0 +1,130 @@
+.zzBoxes, .zzBoxes * {
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+    margin: 0;
+    padding: 0;
+}
+.zzBoxes_overlay {
+    background: #000000 none no-repeat center;
+    position: fixed;
+	z-index: 9999;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    opacity: 0.8;
+}
+.zzBoxes_inner {
+    background-color: #ffffff;
+	color: #646464;
+    font-size: 15px;
+    line-height: 22px;
+	min-width: 480px;
+    max-width: 520px;
+	position: fixed;
+	z-index: 99999;
+    top: 50%;
+    left: 50%;
+    margin-left: -240px;
+    margin-top: -100px;
+    -webkit-transition: margin .3s;
+    transition: margin .3s;
+}
+
+@media (max-width: 520px) {
+	.zzBoxes_inner {
+		width: 95%;
+        max-width: 500px;
+        min-width: 0;
+	}
+}
+.zzBoxes.alert .zzBoxes_title {
+    color: #3071a9;
+}
+.zzBoxes.confirm .zzBoxes_title {
+    color: #3071a9;
+}
+.zzBoxes.prompt .zzBoxes_title {
+    color: #bf7c17;
+}
+.zzBoxes_title {
+    font-size: 1.4em;
+    line-height: 1.5em;
+}
+.zzBoxes_content {
+    padding: 20px 15px;
+    margin: 0;
+}
+.zzBoxes_mess {
+    overflow: auto;
+    text-align: justify;
+}
+.zzBoxes_content img {
+    max-width: 100%;
+}
+.zzBoxes_input {
+    padding: 7px;
+    margin: 10px 0 0;
+    width: 100%;
+    border: 1px solid #dddddd;
+    -webkit-transition: all .3s;
+    transition: all .3s;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.zzBoxes_input:focus {
+    border-color: #df9711;
+    box-shadow: 0 0 3px 1px #df9711;
+    outline: 0 none;
+}
+.zzBoxes_button {
+    text-align: right;
+    background: #f4f4f4;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+.zzBoxes_button > div {
+    background-color: #094089;
+	border: 1px solid #0047a4;
+    border-radius: 4px;
+	color: #ffffff;
+    display: inline-block;
+	font-size: 13px;
+	font-weight: 400;
+    margin: 10px 0 10px 10px;
+	padding: 3px 12px;
+	min-width: 70px;
+    text-align: center;
+	text-transform: uppercase;
+    -webkit-transition: background .3s;
+    transition: background .3s;
+}
+.zzBoxes_button > div:first-child {
+    margin-left: 0;
+}
+div.zzBoxes_cancel {
+	background-color: #fa8564;
+	border: 1px solid #fa8564;
+}
+.zzBoxes_close {
+    position: absolute;
+    width: 30px;
+    height: 20px;
+    right: 2px;
+    top: 2px;
+    text-indent: -9999px;
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAJZJREFUeNpi/P//PwMpgAlKywHxMSD2wKImCogPA7EEmAeyAYhP/oeAb0DsARUD4XAg/gOV2wV2DVTCA6oYWVMIkuLPQGyDrAGbJgzF6BrQNWEoBmEmNA/yADEbEp8ZKoYAODwIMvknlP0TOSBgiqOwuNkDTZM3soZjONzsjaRpC7IGCSDei+5BJE0gxUIgPiOpSQMgwAB/QVTYXhJ/ggAAAABJRU5ErkJggg==) no-repeat center center #fa8564;
+    opacity: 0;
+    -webkit-transition: all .3s;
+    transition: all .3s;
+}
+.zzBoxes_inner:hover .zzBoxes_close {
+    opacity: 1;
+}
+.zzBoxes_button > div:hover, .zzBoxes_close:hover {
+	background-color: #666666;
+	border: 1px solid #616161;
+    cursor: pointer;
+}

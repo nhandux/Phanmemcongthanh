@@ -1,0 +1,330 @@
+@import url(../fonts/font-awesome/font-awesome.css);
+*, *:before, *:after {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	margin: 0 auto;
+	padding: 0;
+}
+strong, b {
+	font-weight: bold;
+}
+h1, h2, h3, h4, h5 {
+	font-weight: bold;
+}
+.clearfix:before,
+.clearfix:after {
+	display: table;
+	content: " ";
+}
+.clearfix:after {
+	clear: both;
+}
+body.print-body {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	line-height: 16px;
+	color: #000000;
+}
+.print-body table {
+	width: 100%;
+	border: none;
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+.ticket-p-page {
+	width: 660px;
+}
+.goods-print {
+	padding-top: 20px;
+	margin: 0 auto;
+	width: 718px;
+	overflow: hidden;
+}
+.goods-print .g-pad {
+	padding: 15px 0 5px;
+}
+.goods-print h2 {
+	font-size: 15px;
+	text-transform: uppercase;
+}
+.ticket-print {
+	font-family: 'Times New Roman', sans-serif;
+	font-size: 17px;
+	line-height: 20px;
+	font-weight: bold;
+	width: 580px;
+	height: 403px;
+	margin: 0 auto !important;
+	padding-top: 206px;
+	padding-left: 135px;
+}
+.ticket-print table tr td {
+	white-space: nowrap;
+}
+.ticket-print table tr td:first-child {
+	width: 230px;
+	max-width: 230px;
+}
+.ticket-print table tr:first-child td {
+	font-weight: bold;
+	text-transform: uppercase;
+	padding-bottom: 3px;
+}
+.ticket-print table tr td.time-f {
+	padding-left: 35px;
+}
+.ticket-print table tr td.time-f span {
+	margin: 0 22px;
+}
+.ticket-print table tr td.time-l {
+	padding-left: 30px;
+}
+.ticket-print table tr td.time-l span {
+	margin: 0 40px;
+}
+.ticket-print table tr:last-child td {
+    padding: 25px 20px 0 140px;
+    text-align: center;
+}
+.ticket-print table tr td.e-time-f {
+	padding-left: 110px;
+	padding-top: 38px;
+	font-size: 14px;
+}
+.ticket-print table tr td.e-time-f span {
+	margin: 0 12px;
+}
+.ticket-print table tr td.e-time-l {
+	padding-left: 165px;
+	font-size: 16px;
+	padding-top: 38px;
+}
+.diagrams-print {
+	margin: 10px auto;
+	max-width: 1000px;
+	font-size: 14px;
+}
+.info-diagrams {
+	margin-bottom: 15px;
+}
+.info-diagrams h4,
+.info-diagrams p {
+	margin: 0;
+	line-height: 1.428571429;
+	text-align: center;
+}
+.bus-diagrams h2 {
+	background-color: #e2e2e2;
+	display: inline-block;
+	padding: 5px 7px 5px 12px;
+	margin: 0 0 5px 0;
+	font-size: 14px;
+	font-weight: bold;
+	line-height: 1;
+	text-transform: uppercase;
+	position: relative;
+}
+.bus-diagrams h2:after {
+	content: "";
+	border-top: 12px solid transparent;
+	border-left: 10px solid #e2e2e2;
+	border-bottom: 12px solid transparent;
+	width: 0;
+	height: 0;
+	position: absolute;
+	left: 100%;
+	top: 0;
+}
+.bus-diagrams .note {
+	font-size: 12px;
+	margin: 0 0 5px;
+}
+.bus-diagrams .note .title {
+	font-style: italic;
+	text-decoration: underline;
+}
+.bus-diagrams .note label {
+	font-weight: normal;
+}
+.bus-diagrams .note .color {
+	background-color: #f1f2f7;
+	width: 16px;
+	height: 16px;
+	display: inline-block;
+	margin-left: 10px;
+}
+.bus-diagrams .note .color.color-1 {
+	background-color: transparent;
+}
+.bus-diagrams .note .color.color-2 {
+	background-color: transparent;
+}
+.bus-diagrams .note .color.color-3 {
+	background-color: transparent;
+}
+.bus-diagrams .note .color.color-4 {
+	background-color: transparent;
+}
+.bus-diagrams .note .color.color-5 {
+	background-color: transparent;
+}
+.bus-diagrams .col-a {
+	float: left;
+	width: 50%;
+	padding-right: 5px;
+}
+.bus-diagrams .col-b {
+	float: right;
+	width: 50%;
+	padding-left: 5px;
+}
+.bus-diagrams .seat {
+	float: left;
+	width: 33.333333333%;
+	padding: 1px;
+	height: 72px;
+}
+.bus-diagrams .seat .checkbox {
+	border: 1px solid #ddddde;
+	cursor: pointer;
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	margin: 0;
+	position: relative;
+	z-index: 1;
+	display: block;
+}
+.bus-diagrams .seat .checkbox input[type=checkbox] {
+	display: none;
+}
+.bus-diagrams .seat .checkbox span.tl-seat {
+	background-color: #ffffff;
+	border: 1px solid #ddddde;
+	border-radius: 50%;
+	display: block;
+	font-size: 12px;
+	width: 28px;
+	height: 28px;
+	line-height: 26px;
+	text-align: center;
+	position: absolute;
+	top: 1px;
+	left: 50%;
+	margin-left: -17px;
+	overflow: hidden;
+}
+.bus-diagrams .seat .checkbox span.serial {
+	position: absolute;
+	bottom: 20px;
+	width: 100%;
+	font-size: 13px;
+	text-align: center;
+	overflow: hidden;
+	white-space: nowrap;
+}
+.bus-diagrams .seat .checkbox span.phone {
+	position: absolute;
+	bottom: 3px;
+	width: 100%;
+	text-align: center;
+	overflow: hidden;
+	white-space: nowrap;
+}
+.bus-diagrams .seat .checkbox .in-ck {
+	background-color: #f1f2f7;
+	width: 100%;
+	height: 100%;
+	display: block;
+}
+.bus-diagrams .seat .checkbox .in-ck.boss {
+	background-color: transparent;
+}
+.bus-diagrams .seat .checkbox .in-ck.far-seeing {
+	background-color: transparent;
+}
+.bus-diagrams .seat .checkbox .in-ck.have-put {
+	background-color: transparent;
+}
+.bus-diagrams .seat .checkbox .in-ck.checked-put {
+	background-color: transparent;
+}
+.box-seat h4 {
+	margin: 30px;
+}
+.print-body.print-statistic {
+	font-size: 10pt;
+	line-height: 14pt;
+	width: 19cm;
+	margin: 0.2cm auto;
+}
+.print-body.print-statistic.landscape {
+	width: 27.5cm;
+}
+.print-body.print-statistic h4 {
+	font-size: 10pt;
+	text-decoration: underline;
+	margin: 0.5cm 0.1cm 0.1cm;
+}
+.print-body.print-statistic table {
+	border-collapse: collapse;
+	border-spacing: 0;
+	width: 100%;
+	max-width: 100%;
+}
+.table-bordered>thead>tr>th,
+.table-bordered>tbody>tr>th,
+.table-bordered>tfoot>tr>th,
+.table-bordered>thead>tr>td,
+.table-bordered>tbody>tr>td,
+.table-bordered>tfoot>tr>td {
+	border: 1px solid #000000;
+	padding: 0 0.1cm;
+	line-height: 12pt;
+}
+.table>thead>tr>th {
+	text-align: center;
+}
+.table>tbody>tr>th,
+.table>tfoot>tr>th {
+	text-align: left;
+}
+.table>thead>tr>th,
+.table>tbody>tr>th,
+.table>tfoot>tr>th {
+	font-weight: bold;
+	padding: 0.2cm 0.1cm;
+}
+.lb-sm-ol {
+	font-size: 6pt !important;
+	line-height: 8pt !important;
+	width: 1.2cm !important;
+	padding: 0.1cm 0.05cm !important;
+}
+@media print {
+	.goods-print {
+		font-family: Arial, Helvetica, sans-serif;
+		font-size: 9pt;
+		line-height: 13pt;
+		padding: 1.2cm 0 0;
+		width: 19cm;
+	}
+	.goods-print .g-pad {
+		padding: 0.4cm 0 0.15cm;
+	}
+	.goods-print h2 {
+		font-size: 13pt;
+	}
+	.ticket-print {
+		background: none;
+	}
+	.diagrams-print {
+		max-width: 28cm;
+		font-size: 12pt;
+		size: 29.7cm 21cm;
+		margin: 1cm 0.85cm;
+		mso-page-orientation: landscape;
+		mso-footer:f1;
+	}
+}

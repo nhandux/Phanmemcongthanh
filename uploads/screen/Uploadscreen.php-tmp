@@ -1,0 +1,18 @@
+<?php
+define('TTH_SYSTEM', true);
+
+$filteredData = substr($_POST['img_val'], strpos($_POST['img_val'], ",")+1);
+
+$unencodedData = base64_decode($filteredData);
+
+file_put_contents('ducnhan.png', $unencodedData);
+
+//Show the image
+// echo '<img src="'.$_POST['img_val'].'" />';
+?>
+<script type="text/javascript" src="/js/jquery.boxes.js"></script>
+
+<script type="text/javascript">
+alert('Bạn đã được lưu ảnh thành công')
+	 window.location = "/"
+</script>

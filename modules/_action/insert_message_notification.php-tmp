@@ -1,0 +1,45 @@
+<?php
+$user_id = $account['id'];
+$OK      = false;
+if (isset($_POST['content']) && $_POST['content'] != '') {
+
+	$content      = $_POST['content'];
+	$date         = new DateClass();
+	$db->table    = "calendar2";
+	$current_time = strtotime($date->vnOther(time(), 'Y-m-d H:i'));
+	$data         = array(
+		'type'         => 2,
+		'content'      => $content,
+		'created_time' => $current_time,
+		'user_id'      => $user_id,
+	);
+	$db->insert($data);
+	$id = $db->LastInsertID;
+	insertNotify2($id, array(), $user_id, 10);
+	$db->table = "calendar_user";
+	$data      = array(
+		'calendar' => $id,
+		'user_id'  => $user_id
+	);
+	$db->insert($data);
+	if ($db->LastInsertID > 0) {
+		$OK  = true;
+		$URL = "/";
+	} else {
+		$OK = 'Lỗi hệ thống, không thể thêm công việc.';
+	}
+
+	$process = false;
+	$txt     = '';
+
+	if ($OK === true) {
+		$process = true;
+		$txt     = 'Gửi tin nhắn thành công';
+	} else {
+		$process = false;
+		$txt     = $OK;
+	}
+
+}
+
+?>

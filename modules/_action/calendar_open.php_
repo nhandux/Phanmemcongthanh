@@ -1,0 +1,550 @@
+<?php
+if (!defined('TTH_SYSTEM')) { die('Please stop!'); }
+//
+if(isset($_POST['open'])) {
+	$type   = $_POST['type'];
+	$id     = $_POST['id']+0;
+	if($type=='personal') {
+		$date = new DateClass();
+		$personnel = $account["id"];
+		$list = array();
+		$current_time = strtotime($date->vnOther(time(), 'Y-m-d H:i'));
+
+		$db->table = "calendar";
+		$db->condition = "`calendar_id` = $id";
+		$db->order = "";
+		$db->limit = 1;
+		$rows = $db->select();
+		foreach($rows as $row) {
+			$list_personal = $list_role = $list_agency = array();
+			// ---- Personal
+			$to_personal = $row['to_personal'];
+			$to_personal = str_replace(';', ',', $to_personal);
+			if($to_personal!='') {
+				$db->table = "core_user";
+				$db->condition = "`user_id` IN ($to_personal)";
+				$db->order = "";
+				$db->limit = "";
+				$rws = $db->select();
+				foreach ($rws as $rw) {
+					array_push($list_personal, stripslashes($rw['full_name']));
+				}
+			}
+			$list_personal = implode('; ', $list_personal);
+			if(!empty($list_personal)) array_push($list, $list_personal);
+			// ---- Role
+			$to_role = $row['to_role'];
+			$to_role = str_replace(';', ',', $to_role);
+			if($to_role!='') {
+				$db->table = "core_role";
+				$db->condition = "`role_id` IN ($to_role)";
+				$db->order = "";
+				$db->limit = "";
+				$rws = $db->select();
+				foreach($rws as $rw) {
+					array_push($list_role, stripslashes($rw['name']));
+				}
+			}
+			$list_role = implode('; ', $list_role);
+			if(!empty($list_role)) array_push($list, $list_role);
+			// ---- Agency
+			$to_agency = $row['to_agency'];
+			if($to_agency==0 && $to_agency!="") {
+				$list_agency = '[Corp.] - TỔNG CÔNG TY';
+			} else {
+				$to_agency = str_replace(';', ',', $to_agency);
+				if($to_agency!='') {
+					$db->table = "agency";
+					$db->condition = "`agency_id` IN ($to_agency)";
+					$db->order = "";
+					$db->limit = "";
+					$rws = $db->select();
+					foreach($rws as $rw) {
+						array_push($list_agency, stripslashes($rw['name']));
+					}
+				}
+				$list_agency = implode('; ', $list_agency);
+			}
+			if(!empty($list_agency)) array_push($list, $list_agency);
+			$list = implode('; ', $list);
+
+			$icon = array(
+					0 => '<i class="fa fa-users" data-toggle="tooltip" data-placement="top" title="Công việc được giao"></i> &nbsp;',
+					1 => '<i class="fa fa-user" data-toggle="tooltip" data-placement="top" title="Công việc cá nhân"></i> &nbsp;'
+			);
+
+			// Danh sách User được tương tác.
+			$list_privilege = array();
+			$db->table = "calendar_user";
+			$db->condition = "`calendar` = $id";
+			$db->order = "";
+			$db->limit = "";
+			$rws = $db->select();
+			foreach ($rws as $rw) {
+				array_push($list_privilege, stripslashes($rw['user_id']));
+			}
+			array_push($list_privilege, $row['supervisor']);
+
+			$status = $extend = -1;
+			$count_extend = $count_extend_s = $extend_time  = $extend_id = 0;
+
+			// Trạng thái gia hạn.
+			$db->table = "calendar_extend";
+			$db->condition = "`calendar` = $id";
+			$db->order = "";
+			$db->limit = "";
+			$db->select();
+			$count_extend = $db->RowCount;
+			//---
+			$db->table = "calendar_extend";
+			$db->condition = "`calendar` = $id";
+			$db->order = "`created_time` DESC";
+			$db->limit = 1;
+			$rows_ex = $db->select();
+			if($db->RowCount>0) {
+				foreach($rows_ex as $row_ex) {
+					if($row_ex['status']==0) {
+						$extend = 0;
+						$extend_time = $row_ex['propose_time'];
+					} elseif($row_ex['status']==1)  {
+						$extend = 1;
+						$extend_time = $row_ex['extend_time'];
+					} else {
+						$extend = 2;
+					}
+				}
+			}
+			// Trạng thái công việc.
+			if($row['disable']==1) {
+				$status = 6;
+			} elseif($row['status']==1) {
+				$status = 5;
+			} else {
+				if($count_extend>0) {
+					if($extend_time>=$current_time) {
+						$status = 3;
+					} else {
+						$status = 4;
+					}
+				} else {
+					if($row['start_time']>$current_time) {
+						$status = 0;
+					} elseif($row['end_time']>=$current_time) {
+						$warning = getConstant('calendar_warning_endtime')*60;
+						if($row['end_time']-$current_time <= $warning) {
+							$status = 2;
+						} else {
+							$status = 1;
+						}
+					} else {
+						$status = 4;
+					}
+				}
+			}
+			?>
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header <?php if($row['type']==1) echo ' personal';?>">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="myModalLabel"><?php echo $icon[$row['type']];?>Xem lịch công việc</h4>
+					</div>
+					<div class="modal-body">
+						<div class="form-responsive">
+							<div class="item-1">
+								<table class="table table-no-border table-ol-3w table-hover" style="max-width: 600px;">
+									<tr>
+										<td width="120px"><label class="form-lb-tp">Tên công việc:</label></td>
+										<td colspan="3"><label><?php echo stripslashes($row['title']);?></label></td>
+									</tr>
+									<tr>
+										<td><label class="form-lb-tp">Mức độ ưu tiên:</label></td>
+										<td><span class="lb-level <?php echo getTableLevel($row['level']);?>"><?php echo getTableLevel($row['level'], 'title');?></span></td>
+										<?php
+										if($row['type']==0) echo '<td align="right">Thưởng/Phạt:</td><td><label>' . $row['to_matches'] . '</label> (điểm)</td>';
+										else echo '<td>&nbsp;</td><td>&nbsp;</td>';
+										?>
+									</tr>
+									<?php
+									if($row['type']==0) echo '<tr><td class="ver-top2">Người nhận:</td><td colspan="3"><label>' . $list . '</label></td></tr>';
+									?>
+									<tr>
+										<td class="ver-top2"><label class="form-lb-tp">Địa điểm:</label></td>
+										<td colspan="3"><label><?php echo stripslashes($row['address']);?></label></td>
+									</tr>
+									<tr>
+										<td><label class="form-lb-tp">Bắt đầu:</label></td>
+										<td colspan="3"><label><?php echo $date->vnFull($row['start_time']);?></label></td>
+									</tr>
+									<tr>
+										<td><label class="form-lb-tp">Kết thúc:</label></td>
+										<td colspan="3"><label><?php echo $date->vnFull($row['end_time']);?></label></td>
+									</tr>
+									<?php
+									if($row['type']==0 && $row['supervisor']==$personnel) echo '<tr><td>Giám sát:</td><td><label>' . getUserFullName($row['supervisor']) . '</label></td><td align="right">Thưởng/Phạt:</td><td><label>' . $row['supervisor_matches'] . '</label> (điểm)</td></tr>';
+									elseif($row['type']==0) echo '<tr><td>Giám sát:</td><td colspan="3"><label>' . getUserFullName($row['supervisor']) . '</label></td></tr>';
+									?>
+									<tr>
+										<td><label class="form-lb-tp">Têp đính kèm:</label></td>
+										<td colspan="3">
+											<?php
+											if(file_exists(ROOT_DIR  . DS . 'uploads' . DS . 'document' . DS . 'calendar' . DS . $row['file']) && ($row['file']!='')) echo '<a target="_blank" href="' . HOME_URL_LANG . '/uploads/document/calendar/' . $row['file'] . '" data-toggle="tooltip" data-placement="top" title="Tải tệp xuống"><i class="fa fa-paperclip fa-lg"></i> (Tải xuống)</a>';
+											else echo '&nbsp;';
+											?>
+										</td>
+									</tr>
+									<tr>
+										<td class="ver-top2"><label class="form-lb-tp">Ghi chú:</label></td>
+										<td colspan="3"><?php echo str_replace(PHP_EOL, '<br>', stripslashes($row['note']));?></td>
+									</tr>
+									<tr>
+										<td><label class="form-lb-tp">Trạng thái:</label></td>
+										<td colspan="3">
+											<?php
+											if($status==3) echo '<button onclick="return extend_modal(' . $id . ', \'view_personal\');" class="lb-status stt-' . $status. '" data-toggle="tooltip" data-placement="top" title="Xem gia hạn">' . $calendar_status[$status] . ' (' . $count_extend . ')</button> <span class="text-extend" data-toggle="tooltip" data-placement="top" title="Trạng thái gia hạn">' . $calendar_extend[$extend] . '</span>';
+											elseif($status==5) echo '<button onclick="return complete_calendar(' . $id . ', \'personal\');" class="lb-status stt-' . $status. '" data-toggle="tooltip" data-placement="top" title="Xem báo cáo">' . $calendar_status[$status] . '</button>';
+											else echo '<span class="lb-status stt-' . $status . '">' . $calendar_status[$status] . '</span>';
+											if($status!=3 && $count_extend>0) echo ' <button onclick="return extend_modal(' . $id . ', \'view_personal\');" class="text-extend" data-toggle="tooltip" data-placement="top" title="Xem gia hạn">Gia hạn (' . $count_extend . ')</button>';
+											?>
+										</td>
+									</tr>
+								</table>
+							</div>
+							<?php
+							if(in_array($personnel, $list_privilege) && $row['disable']==0) {
+							if($status != 5 && $status != 4) {
+							?>
+							<div class="item-2" style="display: none;">
+								<form id="_calendar_complete" method="post" onsubmit="return report_calendar('_calendar_complete', 'complete');" enctype="multipart/form-data">
+									<input type="hidden" name="id" value="<?php echo $id;?>">
+									<table class="table table-no-border table-ol-3w table-hover" style="max-width: 450px;">
+										<tr>
+											<td width="120px"><label class="form-lb-tp">Kết quả:</label></td>
+											<td>
+												<select class="form-control" disabled required="required" name="result">
+													<option value="1" selected>ĐÃ HOÀN THÀNH</option>
+												</select>
+											</td>
+										</tr>
+										<tr>
+											<td><label class="form-lb-tp">Têp đính kèm:</label></td>
+											<td><input class="form-control file" type="file" name="files" data-show-upload="false" data-show-preview="false" data-max-file-count="1" placeholder="Chọn file đính kèm..."></td>
+										</tr>
+										<tr>
+											<td class="ver-top"><label class="form-lb-tp">Ghi chú:</label></td>
+											<td>
+												<textarea class="form-control" name="note" rows="5"></textarea>
+											</td>
+										</tr>
+										<tr>
+											<td colspan="2" class="text-right item-btn">
+												<button type="submit" class="btn btn-success btn-sm" name="complete"><i class="fa fa-save"></i></button>
+												<button type="button" class="btn btn-default btn-sm"><i class="fa fa-reply"></i></button>
+											</td>
+										</tr>
+									</table>
+								</form>
+							</div>
+							<?php } if($status == 4) { ?>
+							<div class="item-3" style="display: none;">
+								<form id="_calendar_extend" method="post" onsubmit="return report_calendar('_calendar_extend', 'extend');" enctype="multipart/form-data">
+									<input type="hidden" name="id" value="<?php echo $id;?>">
+									<table class="table table-no-border table-ol-3w table-hover" style="max-width: 450px;">
+										<tr>
+											<td width="120px"><label class="form-lb-tp">Kết thúc:</label></td>
+											<td><input style="max-width: 140px;" class="form-control" id="time_extend" type="text" name="extend_time" maxlength="16" required="required" autocomplete="off"></td>
+										</tr>
+										<tr>
+											<td><label class="form-lb-tp">Têp đính kèm:</label></td>
+											<td><input class="form-control file" type="file" name="files" data-show-upload="false" data-show-preview="false" data-max-file-count="1" placeholder="Chọn file đính kèm..."></td>
+										</tr>
+										<tr>
+											<td class="ver-top"><label class="form-lb-tp">Lý do gia hạn:</label></td>
+											<td>
+												<textarea class="form-control" name="note" rows="5"></textarea>
+											</td>
+										</tr>
+										<tr>
+											<td colspan="2" class="text-right item-btn">
+												<button type="submit" class="btn btn-info btn-sm" name="extend"><i class="fa fa-save"></i></button>
+												<button type="button" class="btn btn-default btn-sm"><i class="fa fa-reply"></i></button>
+											</td>
+										</tr>
+									</table>
+								</form>
+								<script>
+									jQuery(function(){
+										$('#time_extend').datetimepicker({
+											format:'d/m/Y H:i',
+											lang:'vi',
+											onShow:function( ct ){
+												this.setOptions({
+													minDate:'+01/01/1970',
+													format:'d/m/Y H:i',
+													formatDate:'d/m/Y H:i'
+												})
+											}
+										});
+									});
+								</script>
+							</div>
+							<?php
+							}
+							}
+							?>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<?php
+						if(in_array($personnel, $list_privilege) && $row['disable']==0) {
+						if(in_array($status, array(0, 1, 2)) || ($status==3 && $extend==1)) { ?>
+						<input type="button" class="btn btn-success btn-sm" value="Báo cáo">
+						<?php } if($status == 4) { ?>
+						<input type="button" class="btn btn-info btn-sm" value="Gia hạn">
+						<?php } ?>
+						<?php if($row['type']==1) { ?>
+						<input type="button" class="btn btn-pink btn-sm" value="Chỉnh sửa" onclick="return edit_calendar(<?php echo $id;?>);">
+						<input type="button" class="btn btn-danger btn-sm" onclick="return delete_calendar(<?php echo $id;?>);" value="Xóa việc">
+						<?php } }?>
+						<input type="button" class="btn btn-warning btn-sm" data-dismiss="modal" value="Đóng">
+					</div>
+				</div>
+				<script>
+					$(function(){
+						$('.file').fileinput();
+						$(".modal-footer .btn-success").click(function(){
+							$(".item-1").slideUp();
+							$(".item-3").slideUp();
+							$(".item-2").slideDown();
+						});
+						$(".item-2 .item-btn>.btn-default").click(function(){
+							$(".item-2").slideUp();
+							$(".item-3").slideUp();
+							$(".item-1").slideDown();
+						});
+						$(".modal-footer .btn-info").click(function(){
+							$(".item-1").slideUp();
+							$(".item-2").slideUp();
+							$(".item-3").slideDown();
+						});
+						$(".item-3 .item-btn>.btn-default").click(function(){
+							$(".item-3").slideUp();
+							$(".item-2").slideUp();
+							$(".item-1").slideDown();
+						});
+					});
+				</script>
+			</div>
+			<?php
+		}
+	} elseif($type=='manage') {
+		// -- Bảng phân quyền :)
+		$corePrivilegeSlug = array();
+		$corePrivilegeSlug = corePrivilegeSlug($account["id"]);
+		$date = new DateClass();
+		$personnel = $account["id"];
+		$list = array();
+		$current_time = strtotime($date->vnOther(time(), 'Y-m-d H:i'));
+
+		$db->table = "calendar";
+		$db->condition = "`calendar_id` = $id";
+		$db->order = "";
+		$db->limit = 1;
+		$rows = $db->select();
+		foreach($rows as $row) {
+			$list_personal = $list_role = $list_agency = array();
+			// ---- Personal
+			$to_personal = $row['to_personal'];
+			$to_personal = str_replace(';', ',', $to_personal);
+			if($to_personal!='') {
+				$db->table = "core_user";
+				$db->condition = "`user_id` IN ($to_personal)";
+				$db->order = "";
+				$db->limit = "";
+				$rws = $db->select();
+				foreach ($rws as $rw) {
+					array_push($list_personal, stripslashes($rw['full_name']));
+				}
+			}
+			$list_personal = implode('; ', $list_personal);
+			if(!empty($list_personal)) array_push($list, $list_personal);
+			// ---- Role
+			$to_role = $row['to_role'];
+			$to_role = str_replace(';', ',', $to_role);
+			if($to_role!='') {
+				$db->table = "core_role";
+				$db->condition = "`role_id` IN ($to_role)";
+				$db->order = "";
+				$db->limit = "";
+				$rws = $db->select();
+				foreach($rws as $rw) {
+					array_push($list_role, stripslashes($rw['name']));
+				}
+			}
+			$list_role = implode('; ', $list_role);
+			if(!empty($list_role)) array_push($list, $list_role);
+			// ---- Agency
+			$to_agency = $row['to_agency'];
+			if($to_agency==0 && $to_agency!="") {
+				$list_agency = '[Corp.] - TỔNG CÔNG TY';
+			} else {
+				$to_agency = str_replace(';', ',', $to_agency);
+				if($to_agency!='') {
+					$db->table = "agency";
+					$db->condition = "`agency_id` IN ($to_agency)";
+					$db->order = "";
+					$db->limit = "";
+					$rws = $db->select();
+					foreach($rws as $rw) {
+						array_push($list_agency, stripslashes($rw['name']));
+					}
+				}
+				$list_agency = implode('; ', $list_agency);
+			}
+			if(!empty($list_agency)) array_push($list, $list_agency);
+			$list = implode('; ', $list);
+
+			$icon = array(
+					0 => '<i class="fa fa-users" data-toggle="tooltip" data-placement="top" title="Công việc được giao"></i> &nbsp;',
+					1 => '<i class="fa fa-user" data-toggle="tooltip" data-placement="top" title="Công việc cá nhân"></i> &nbsp;'
+			);
+
+			$status = $extend = -1;
+			$count_extend = $extend_time  = $extend_id = 0;
+
+			// Trạng thái gia hạn.
+			$db->table = "calendar_extend";
+			$db->condition = "`calendar` = $id";
+			$db->order = "";
+			$db->limit = "";
+			$db->select();
+			$count_extend = $db->RowCount;
+			//---
+			$db->table = "calendar_extend";
+			$db->condition = "`calendar` = $id";
+			$db->order = "`created_time` DESC";
+			$db->limit = 1;
+			$rows_ex = $db->select();
+			if($db->RowCount>0) {
+				foreach($rows_ex as $row_ex) {
+					$extend_id = $row_ex['calendar_extend_id']+0;
+					if($row_ex['status']==0) {
+						$extend = 0;
+						$extend_time = $row_ex['propose_time'];
+					} elseif($row_ex['status']==1)  {
+						$extend = 1;
+						$extend_time = $row_ex['extend_time'];
+					} else {
+						$extend = 2;
+					}
+				}
+			}
+			// Trạng thái công việc.
+			if($row['disable']==1) {
+				$status = 6;
+			} elseif($row['status']==1) {
+				$status = 5;
+			} else {
+				if($count_extend>0) {
+					if($extend_time>=$current_time) {
+						$status = 3;
+					} else {
+						$status = 4;
+					}
+				} else {
+					if($row['start_time']>$current_time) {
+						$status = 0;
+					} elseif($row['end_time']>=$current_time) {
+						if($row['end_time'] - (getConstant('calendar_warning_endtime')*60) < $current_time) {
+							$status = 2;
+						} else {
+							$status = 1;
+						}
+					} else {
+						$status = 4;
+					}
+				}
+			}
+			?>
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header <?php if($row['type']==1) echo ' personal';?>">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="myModalLabel"><?php echo $icon[$row['type']];?>Xem lịch công việc</h4>
+					</div>
+					<div class="modal-body">
+						<?php if(in_array("calendar;eye", $corePrivilegeSlug['op'])) { ?>
+						<div class="form-responsive">
+							<div class="item-1">
+								<table class="table table-no-border table-ol-3w table-hover" style="max-width: 600px;">
+									<tr>
+										<td width="120px"><label class="form-lb-tp">Tên công việc:</label></td>
+										<td colspan="3"><label><?php echo stripslashes($row['title']);?></label></td>
+									</tr>
+									<tr>
+										<td><label class="form-lb-tp">Mức độ ưu tiên:</label></td>
+										<td><span class="lb-level <?php echo getTableLevel($row['level']);?>"><?php echo getTableLevel($row['level'], 'title');?></span></td>
+										<?php
+										if($row['type']==0) echo '<td align="right">Thưởng/Phạt:</td><td><label>' . $row['to_matches'] . '</label> (điểm)</td>';
+										else echo '<td>&nbsp;</td><td>&nbsp;</td>';
+										?>
+									</tr>
+									<?php
+									if($row['type']==0) echo '<tr><td class="ver-top2">Người nhận:</td><td colspan="3"><label>' . $list . '</label></td></tr>';
+									?>
+									<tr>
+										<td class="ver-top2"><label class="form-lb-tp">Địa điểm:</label></td>
+										<td colspan="3"><label><?php echo stripslashes($row['address']);?></label></td>
+									</tr>
+									<tr>
+										<td><label class="form-lb-tp">Bắt đầu:</label></td>
+										<td colspan="3"><label><?php echo $date->vnFull($row['start_time']);?></label></td>
+									</tr>
+									<tr>
+										<td><label class="form-lb-tp">Kết thúc:</label></td>
+										<td colspan="3"><label><?php echo $date->vnFull($row['end_time']);?></label></td>
+									</tr>
+									<?php
+									if($row['type']==0) echo '<tr><td>Giám sát:</td><td><label>' . getUserFullName($row['supervisor']) . '</label></td><td align="right">Thưởng/Phạt:</td><td><label>' . $row['supervisor_matches'] . '</label> (điểm)</td></tr>';
+									?>
+									<tr>
+										<td><label class="form-lb-tp">Têp đính kèm:</label></td>
+										<td colspan="3">
+											<?php
+											if(file_exists(ROOT_DIR  . DS . 'uploads' . DS . 'document' . DS . 'calendar' . DS . $row['file'])&&($row['file']!='')) echo '<a target="_blank" href="' . HOME_URL_LANG . '/uploads/document/calendar/' . $row['file'] . '" data-toggle="tooltip" data-placement="top" title="Tải tệp xuống"><i class="fa fa-paperclip fa-lg"></i> (Tải xuống)</a>';
+											else echo '&nbsp;';
+											?>
+										</td>
+									</tr>
+									<tr>
+										<td class="ver-top2"><label class="form-lb-tp">Ghi chú:</label></td>
+										<td colspan="3"><?php echo str_replace(PHP_EOL, '<br>', stripslashes($row['note']));?></td>
+									</tr>
+									<tr>
+										<td><label class="form-lb-tp">Trạng thái:</label></td>
+										<td colspan="3">
+											<?php
+											if($status==3) echo '<button onclick="return extend_modal(' . $id . ', \'confirm\');" class="lb-status stt-' . $status. '" data-toggle="tooltip" data-placement="top" title="Xác nhận gia hạn">' . $calendar_status[$status] . ' (' . $count_extend . ')</button> <span class="text-extend" data-toggle="tooltip" data-placement="top" title="Trạng thái gia hạn">' . $calendar_extend[$extend] . '</span>';
+											elseif($status==5) echo '<button onclick="return complete_calendar(' . $id . ', \'manage\');" class="lb-status stt-' . $status. '" data-toggle="tooltip" data-placement="top" title="Xem báo cáo">' . $calendar_status[$status] . '</button>';
+											else echo '<span class="lb-status stt-' . $status . '">' . $calendar_status[$status] . '</span>';
+											if($status!=3 && $count_extend>0) echo ' <button onclick="return extend_modal(' . $id . ', \'view_manage\');" class="text-extend" data-toggle="tooltip" data-placement="top" title="Xem gia hạn">Gia hạn (' . $count_extend . ')</button>';
+											?>
+										</td>
+									</tr>
+								</table>
+							</div>
+						</div>
+						<?php } else echo '<div class="panel-show-error"><span class="show-error">Bạn không được phân quyền với chức năng này.</span></div>' ?>
+					</div>
+					<div class="modal-footer">
+						<?php if(in_array("calendar;eye", $corePrivilegeSlug['op'])) { ?>
+						<?php if(in_array("calendar_edit", $corePrivilegeSlug['op']) && $row['type']==0) echo '<a  href="' . TTH_PATH_LK . 'calendar' . TTH_PATH_OP_LK . 'calendar_edit&id=' . $id . '" class="btn btn-pink btn-sm">Chỉnh sửa</a>'; ?>
+						<input type="button" class="btn btn-danger btn-sm" onclick="return delete_calendar(<?php echo $id;?>);" value="Xóa việc">
+						<?php } ?>
+						<input type="button" class="btn btn-warning btn-sm" data-dismiss="modal" value="Đóng">
+					</div>
+				</div>
+			</div>
+			<?php
+		}
+	}
+} else echo 'Error--';

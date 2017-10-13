@@ -1,0 +1,142 @@
+<?php
+@session_start();
+// System
+define( 'TTH_SYSTEM', true );
+// declare global variable holding the value of incrementing order code (CT_yyyy000000)
+global $incrementing_order_code;
+$url = isset($_GET['url']) ? $_GET['url'] : 'home';
+$path = array();
+$path = explode('/',$url);
+//----------------------------------------------------------------------------------------------------------------------
+require_once(str_replace( DIRECTORY_SEPARATOR, '/', dirname( __file__ ) ) . '/define.php');
+require_once(ROOT_DIR . DS ."lang" . DS . TTH_LANGUAGE . ".lang");
+include_once(_F_FUNCTIONS . DS . "Function.php");
+$incrementing_order_code =( date("Y"). MAX_ORDER)+0;
+try {
+	$db =  new ActiveRecord(TTH_DB_HOST, TTH_DB_USER, TTH_DB_PASS, TTH_DB_NAME);
+}
+catch(DatabaseConnException $e) {
+	echo $e->getMessage();
+}
+
+require_once(_F_INCLUDES . DS . "_tth_constants.php");
+require_once(ROOT_DIR . DS . '_ck_login.php');
+$account["id"] = empty($_SESSION["user_id"]) ? 0 : $_SESSION["user_id"]+0;
+require_once(_F_INCLUDES . DS . "_tth_online_daily.php");
+//---------------------------------------------------
+if($login_true) {
+	// chuyển qua trang khóa
+	// echo $login_true;
+	// echo "<br/>";
+
+	require_once(ROOT_DIR . DS . '_lock_screen.php');
+	// end chuyển qua trang khóa
+
+	require_once(_F_INCLUDES . DS . "_tth_log.php");
+	// echo $lock_screen;
+	if($lock_screen) {
+	  include("lock_screen.php");
+	} else {
+		// -- Bảng phân quyền :)
+		$corePrivilegeSlug = array();
+
+		$corePrivilegeSlug = corePrivilegeSlug($account["id"]);
+
+		$tth[TTH_PATH] = isset($_GET[TTH_PATH]) ? $_GET[TTH_PATH] : 'home';
+
+		$tth[TTH_PATH_OP] = isset($_GET[TTH_PATH_OP]) ? $_GET[TTH_PATH_OP] : 'main';
+		if ($tth[TTH_PATH] == 'print') {
+			if (is_file(_F_MODULES . DS . $tth[TTH_PATH] . DS . $tth[TTH_PATH_OP] . ".php")) {
+
+				if (!in_array($tth[TTH_PATH_OP], $corePrivilegeSlug['op'])) {
+
+					loadPageError('Bạn không được phân quyền với chức năng này.', HOME_URL_LANG);
+
+				} else include(_F_MODULES . DS . $tth[TTH_PATH] . DS . $tth[TTH_PATH_OP] . ".php");
+			} else {
+				loadPageError("Hiện tại chưa hỗ trợ chức năng này.", HOME_URL_LANG);
+			}
+		} else {
+			$hide_left_bar = "";
+			$merge_left = "";
+			if (!empty($_COOKIE["sidebar"]) && $_COOKIE["sidebar"] == "hide") {
+				$hide_left_bar = "hide-left-bar";
+				$merge_left = "merge-left";
+			} else {
+				$hide_left_bar = "";
+				$merge_left = "";
+			}
+			?>
+<!DOCTYPE html>
+<html lang="<?php echo TTH_LANGUAGE; ?>">
+<head>
+<?php
+include(_F_INCLUDES . DS . "_tth_head.php");
+include(_F_INCLUDES . DS . "_tth_script.php");
+?>
+</head>
+
+<body>
+<?= getConstant('script_body') ?>
+<section id="container">
+	<?php
+	$agency_roles = array();
+	$core_roles = array();
+	$roles = array();
+	$role = 0;
+	$core_roles = getRoleId($account['id']);
+	foreach($core_roles  as $core_role) {
+		if($core_role !==2 ) $agency_roles[] = $core_role;
+		else $roles[] = $core_role;
+	}
+	
+	
+	
+	include(_F_INCLUDES . DS . "tth_header.php");
+	include(_F_INCLUDES . DS . "tth_menu.php");
+	?>
+	<section id="main-content" class="<?php echo $merge_left; ?>">
+		<section id="wrapper" class="wrapper">
+			<?php
+			if (is_file(_F_MODULES . DS . $tth[TTH_PATH] . DS . $tth[TTH_PATH_OP] . ".php")) {
+
+				if (!in_array($tth[TTH_PATH], $corePrivilegeSlug['ol']) || !in_array($tth[TTH_PATH_OP], $corePrivilegeSlug['op'])) {
+					
+					loadPageError('Bạn không được phân quyền với chức năng này nhé bạn.', HOME_URL_LANG);
+
+				} else include(_F_MODULES . DS . $tth[TTH_PATH] . DS . $tth[TTH_PATH_OP] . ".php");
+
+			} else {
+				loadPageError("Hiện tại chưa hỗ trợ chức năng này.", HOME_URL_LANG);
+			}
+			?>
+		</section>
+
+		<?php
+		include(_F_INCLUDES . DS . "tth_footer1.php");
+		?>
+		
+	</section>
+	<!-- Modal -->
+	<div class="modal fade" id="_calendar_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">&nbsp;</div>
+	
+	<!-- /.Modal -->
+</section>
+<script type="text/javascript" src="<?php echo HOME_URL;?>/js/materialize.js"></script>
+<a href="javascript:void(0)" title="Lên đầu trang" id="go-top"></a>
+<?php
+  if($tth[TTH_PATH_OP] != 'calendar_list') {?>
+<div id="_loading"></div>
+<?php } else{}?>
+<?php
+//if($tth[TTH_PATH]=='home'){ require_once("popup" . DS . "popup.php");}
+echo getConstant('script_bottom');
+echo getConstant('chat_online');
+?>
+</body>
+</html>
+		<?php
+		}
+	}
+}
+else include("login.php");

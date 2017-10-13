@@ -1,0 +1,115 @@
+
+<?php
+if (!defined('TTH_SYSTEM')) {die('Please stop!');}
+//--
+$view_home = isset($_GET['cal'])?$_GET['cal']:'home';
+$ol_agency = getAgencyToCore($corePrivilegeSlug['op'], '/calendar_list;/');
+
+//---
+if ($view_home == 'personal') {
+	include (_F_MODULES.DS.$tth[TTH_PATH].DS."main2.php");
+} elseif (count($ol_agency) > 0) {
+	$list_agency = implode(',', $ol_agency);
+
+	$agency = isset($_GET['ag'])?$_GET['ag']:0;
+
+	?>
+	<!-- Menu path -->
+	<div class="row">
+		<div class="col-md-12">
+			<ul class="breadcrumbs-alt">
+			    <li class="themdon"><span class="themdonhang">Thêm đơn hàng</span></li>
+				<!-- <li>
+					<a href="/"><?php echo $menu_ol[0];?></a>
+				</li>
+				<li>
+					<a href="<?php echo TTH_PATH_LK.$link_ol[1].TTH_PATH_OP_LK.$link_op[1][0];?>"><?php echo $menu_ol[1];
+	?></a>
+				</li>
+				<li>
+					<a href="<?php echo TTH_PATH_LK.$link_ol[1].TTH_PATH_OP_LK.$link_op[1][0];?>"><?php echo $menu_op[1][0];
+	?></a>
+				</li> -->
+			</ul>
+
+		</div>
+	</div>
+	<!-- /.row -->
+	<?php
+	include_once (_F_TEMPLATES.DS."document.php");
+	if (empty($typeFunc)) {$typeFunc = "no";
+	}
+
+	$stringObj = new String();
+	$date      = new DateClass();
+
+	$file_max_size = FILE_MAX_SIZE;
+	$dir_dest      = ROOT_DIR.DS.'uploads'.DS."document".DS;
+	$OK            = $file_ck            = false;
+	$error         = '';
+	if ($typeFunc == 'add') {
+
+		if (empty($tencongty)) {$error = '<span class="show-error">Vui lòng nhập tên công ty.</span>';
+		}
+
+		if (empty($masothue)) {$error = '<span class="show-error">Vui lòng nhập mã số thuế của công ty.</span>';
+		}
+
+		if (empty($namenguoidat)) {$error = '<span class="show-error">Vui lòng nhập tên người đặt hàng.</span>';
+		} else {
+			// ---- FILE
+
+			if ($OK) {
+				$id_query  = 0;
+				$db->table = "document";
+				$data      = array(
+					'title'         => $db->clearText($title),
+					'type'          => $type+0,
+					'symbols'       => $db->clearText($symbols),
+					'date_issued'   => strtotime($date->dmYtoYmd($date_issued)),
+					'comment'       => $db->clearText($comment),
+					'content'       => $db->clearText($content),
+					'created_time'  => time(),
+					'modified_time' => time(),
+					'user_id'       => $_SESSION["user_id"]
+				);
+				$db->insert($data);
+				$id_query = $db->LastInsertID;
+				if ($file_ck && $id_query > 0) {
+					$stringObj = new String();
+					$u_file    = 'Document_'.time().'_'.substr($stringObj->getSlug($title), 0, 120).$file_type;
+					@rename($dir_dest.$file_full_name, $dir_dest.$u_file);
+					$db->table = "document";
+					$data      = array(
+						'file' => $db->clearText($u_file)
+					);
+					$db->condition = "document_id = $id_query";
+					$db->update($data);
+				}
+				loadPageSuccess("Đã thêm dữ liệu thành công.", TTH_PATH_LK.$link_ol[1].TTH_PATH_OP_LK.$link_op[1][1]);
+				$OK = true;
+			}
+		}
+	} else {
+		$title        = "";
+		$type         = 0;
+		$symbols      = "";
+		$date_issued  = "";
+		$comment      = "";
+		$file         = "";
+		$content      = "";
+		$tencongty    = "";
+		$masothue     = "";
+		$namenguoidat = "";
+		$sodienthoai  = "";
+		$email        = "";
+		$diachi       = "";
+		$skype        = "";
+		$timeend      = "";
+	}
+	if (!$OK) {document(TTH_PATH_LK.$link_ol[1].TTH_PATH_OP_LK.$link_op[1][0], "add", 0, $error, $tencongty, $masothue, $namenguoidat, $sodienthoai, $email, $diachi, $skype, $timeend);
+
+	}
+} else {
+	include (_F_MODULES.DS.$tth[TTH_PATH].DS."main2.php");
+}

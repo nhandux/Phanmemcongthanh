@@ -1,0 +1,877 @@
+<?php
+if (!defined('TTH_SYSTEM')) { die('Please stop!'); }
+//
+?>
+<!-- Menu path -->
+
+
+<!-- /.row -->
+<?php
+if(isset($_POST['idDel'])){
+
+	$idDel = implode(',',$_POST['idDel']);
+
+	$db->table = "document";
+	$db->condition = "document_id IN (".$idDel.")";
+	$db->delete();
+}
+
+$txt_type = '';
+$db->table = "document_type";
+$db->condition = "`is_active` = 1";
+$db->order = "`sort` ASC";
+$db->limit = "";
+$rows = $db->select();
+if($db->RowCount > 0) {
+	$txt_type .= '<select data-column="2" class="form-control filter">';
+	$txt_type .= '<option value="">Loại văn bản...</option>';
+	foreach($rows as $row) {
+		$txt_type .= '<option value="' . $row['document_type_id'] . '">' . $row['title'] . '</option>';
+	}
+	$txt_type .='</select>';
+}
+?>
+<div class="row">
+<div class="col-md-8 locdanhsach">
+<span>Hiển thị 
+     <select class="sohanghien"> 
+     <option>5</option>
+     <option>10</option>
+     <option>25</option>
+     <option>50</option>
+     </select>
+
+      trên tổng số <span style="margin: 0px 5px;">65</span> đơn hàng	</span>
+<!-- form tìm kiếm  -->
+<form class="searchitemtable">
+	<label class="hiendi"><input type="text" class="formtimclick" placeholder="Nhập từ khóa... "><button type="submit" class="nutbamtim"><i class="fa fa-search"></i>
+	</button></label>
+	<span name="button" class="searchformthem"><i class="fa fa-search"></i> </span>
+</form>
+<!-- end form tìm kiếm -->
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('.searchformthem').click(function(event) {
+			/* Act onthe event */
+			$(this).css('display','none');
+			$('.hiendi').css('padding-left','20px')
+		   $('.hiendi').toggle( "slide" );
+
+		});
+	});
+</script>
+<?php $ol = 'document';
+      $op = 'document_list_inkem'; 
+   
+   $fun = isset($_GET['fun']) ? $_GET['fun'] : 'canhan';
+    
+?>
+
+</div>
+<div class="col-md-4">
+	<ul class="nh_locbang" title="xử lý nội dung">	
+		<li class="dropdown">
+				<a data-toggle="dropdown" class="dropdown-toggle username" href="#">
+					<?php
+					$info_user = array();
+					$info_user = getInfoUser($account["id"]);
+					 
+					if($fun =="canhan") echo '<i class="fa fa-calendar-plus-o"></i> Cá nhân';
+					else echo '<i class="fa fa-calendar"></i> Tổ chức' ?></span>
+					
+					<b class="caret"></b>
+				</a>
+				<ul class="dropdown-menu extended logout">
+					<li><a href="/?ol=<?= $ol ?>&op=<?= $op ?>&fun=canhan"><i class="fa fa-calendar-plus-o"></i> Cá nhân</a></li>
+					<li><a href="/?ol=<?= $ol ?>&op=<?= $op ?>&fun=tochuc"><i class="fa fa-calendar"></i> Tổ chức</a></li>
+					<li class="divider"></li>
+				</ul>
+		</li>
+	</ul>	
+
+	</div>
+	<div class="col-lg-12">
+		<div class="panel panel-no-border">
+			<div class="table-responsive">
+				<form action="<?php echo TTH_PATH_LK . $link_ol[1] . TTH_PATH_OP_LK . $link_op[1][1];?>" method="post" id="_ol_delete">
+				<?php if($fun == "canhan"){ ?>
+					 <table class="table table-no-border table-ol-3w table-hover">
+						<thead>
+						
+                        <tr class="panel-heading thantran" >
+								<th><label class="form-lb-tp">Code</label></th>
+								<th><label class="form-lb-tp">Khách hàng</label></th>
+								<th width="150px;"><label class="form-lb-tp">Đơn hàng</label></th>
+								<th width="200px;"><label class="form-lb-tp">Ghi chú</label></th>
+								<th><label class="form-lb-tp">Tình trạng</label></th>
+								<th><label class="form-lb-tp">Thực hiện</label></th>
+					   </tr>
+						</thead>
+						<tbody class="taplet">
+							<tr class="bangkhachhang">
+								<td>
+									<span class="hostcode codeorder"> CT001002526 </span>
+									<p class="hienhan">
+										<span>Hạn: 30/04/2017</span>
+	                                     <span>Nguyễn Văn A</span>									
+									</p>
+								</td>
+								<td>
+									<span class="tiude"> Công ty xuất kẽm Danaweb </span>
+									<p class="bosungtiu">
+										<span>Mr.Captain American</span>
+	                                    <span>0987 654 321</span>									
+									</p>
+								</td>
+								<td>
+									
+									<p class="bosungtiu">
+									    <span> Name card</span>
+										<span>Brochure</span>
+	                                    <span>poster</span>									
+									</p>
+								</td>
+								<td>
+									<span class="tghoanhthanh">
+										Cần hoành thành trước 30/4
+									</span>
+									<span data-toggle="tooltip" class = "hienpopup" data-placement="right" title="" data-original-title="Xem ghi chú">
+									<i class="fa fa-file-text-o" aria-hidden="true" data-toggle="modal" data-target="#_calendar_modal" onclick="return add_calendar_modal();"  title="xem chi tiết chú thích"></i></span>
+								</td>
+								<td>
+
+								<select name="tech" class="tech form-control sectcustum1" id="tech" style="padding-left: 20px;">
+							      <option value="Cho xuất kẽm" data-image="<?= HOME_URL;?>/images/hong.png">Cho xuất kẽm</option>
+							      <option  selected="selected" value="Đang xuất kẽm" data-image="<?= HOME_URL;?>/images/xanh.png">Đang xuất kẽm</option>
+							      <option value="Cho in" data-image="<?= HOME_URL;?>/images/lacay.png" name="cd">Cho in </option>
+							      
+							    </select>
+                               
+								</td>
+								<td>
+									<div class="imea">
+								
+								<img src="<?= HOME_URL;?>/images/setinh.png" class="aoap">
+								<select  class=" form-control sectcustum3 set1">
+								   <option value="calendar" >&nbsp;</option>
+								  <option value="Nhân" selected="selected" >Nhân</option>
+								  <option value="Hòa">Hòa</option>
+								  <option value="Thức" >Thức</option>
+								  <option value="Toàn">Toàn</option>
+								  <option value="Duyên">Duyên</option>
+								  <option value="Hà">Hà</option></select>
+								</select>
+								</div>
+								<ul class="hienxuly">	
+									<li class="dropdown">
+											<a data-toggle="dropdown" class="dropdown-toggle username" href="#">
+												<i class="fa fa-pencil" data-toggle="tooltip" data-placement="left" title="" data-original-title="Công cụ" ></i>
+												
+											</a>
+											<ul class="dropdown-menu extended logout nh_afterdrop">
+												<li><a href="/?ol=calendar&op=calendar_list"  data-toggle="tooltip" data-placement="left" title="" data-original-title="Xem chi tiết" ><i class="fa fa-file-text-o"></i> Xem chi tiết</a></li>
+												<li><a href="javascript:;"  data-toggle="tooltip" data-placement="left" title="" onclick="editcreen()" data-original-title="Chỉnh sửa"><i class="fa fa-paint-brush"></i> Chỉnh sửa</a></li>
+												<li class="divider"></li>
+												<li><a href="javascript:;"   data-toggle="tooltip" data-placement="left" title="" onclick="return open_calendar('manage', 1);" data-original-title="Lịch sử thực hiện" ><i class="fa fa-history"></i> Lịch sử </a></li>
+											<li><a href="javascript:;" class="xoahangngang"  data-toggle="tooltip" data-placement="left" title="" data-original-title="Xóa đơn hàng" ><i class="fa fa-trash-o"></i> Xóa </a></li>
+											</ul>
+									</li>
+								</ul>	
+								</td>
+							</tr>
+							<tr class="bangkhachhang">
+								<td>
+									<span class="tiude codeorder"> CT001002526 </span>
+									<p class="hienhan">
+										<span>Hạn: 30/04/2017</span>
+	                                     <span>Nguyễn Văn A</span>									
+									</p>
+								</td>
+								<td>
+									<span class="tiude"> Công ty xuất kẽm Danaweb </span>
+									<p class="bosungtiu">
+										<span>Mr.Captain American</span>
+	                                    <span>0987 654 321</span>									
+									</p>
+								</td>
+								<td>
+									
+									<p class="bosungtiu">
+									    <span> Name card</span>
+										<span>Brochure</span>
+	                                    <span>poster</span>									
+									</p>
+								</td>
+								<td>
+									<span class="tghoanhthanh">
+										Cần hoành thành trước 30/4
+									</span>
+									<span data-toggle="tooltip" class = "hienpopup" data-placement="right" title="" data-original-title="Xem ghi chú">
+									<i class="fa fa-file-text-o" aria-hidden="true" data-toggle="modal" data-target="#_calendar_modal" onclick="return add_calendar_modal();"  title="xem chi tiết chú thích"></i></span>
+								</td>
+								<td>
+								<select name="tech" class="tech form-control sectcustum1" id="tech1" style="padding-left: 20px;">
+							      <option value="Cho xuất kẽm"   data-image="<?= HOME_URL;?>/images/hong.png">Cho xuất kẽm</option>
+							      <option   value="Đang xuất kẽm" selected="selected" data-image="<?= HOME_URL;?>/images/xanh.png">Đang xuất kẽm</option>
+							      <option  value="Cho in" data-image="<?= HOME_URL;?>/images/lacay.png" name="cd">Cho in</option>
+							      </select>
+								</td>
+								<td><div class="imea">
+								
+								<img src="<?= HOME_URL;?>/images/setinh.png" class="aoap">
+								<select  class=" form-control sectcustum3 set1">
+								  <option value="calendar">&nbsp;</option>
+								  <option value="Nhân"  selected="selected">Nhân</option>
+								  <option value="Hòa">Hòa</option>
+								  <option value="Thức" >Thức</option>
+								  <option value="Toàn">Toàn</option>
+								  <option value="Duyên">Duyên</option>
+								  <option value="Hà">Hà</option></select>
+								</div>
+								<ul class="hienxuly">	
+									<li class="dropdown">
+											<a data-toggle="dropdown" class="dropdown-toggle username" href="#">
+												<i class="fa fa-pencil" data-toggle="tooltip" data-placement="left" title="" data-original-title="Công cụ" ></i>
+												
+											</a>
+											<ul class="dropdown-menu extended logout nh_afterdrop">
+												<li><a href="/?ol=calendar&op=calendar_list"  data-toggle="tooltip" data-placement="left" title="" data-original-title="Xem chi tiết" ><i class="fa fa-file-text-o"></i> Xem chi tiết</a></li>
+												<li><a href="javascript:;"  data-toggle="tooltip" data-placement="left" title="" onclick="editcreen()" data-original-title="Chỉnh sửa"><i class="fa fa-paint-brush"></i> Chỉnh sửa</a></li>
+												<li class="divider"></li>
+												<li><a href="javascript:;"   data-toggle="tooltip" data-placement="left" title="" onclick="return open_calendar('manage', 1);" data-original-title="Lịch sử thực hiện" ><i class="fa fa-history"></i> Lịch sử </a></li>
+											<li><a href="javascript:;" class="xoahangngang"  data-toggle="tooltip" data-placement="left" title="" data-original-title="Xóa đơn hàng" ><i class="fa fa-trash-o"></i> Xóa </a></li>
+											</ul>
+									</li>
+								</ul>	
+								</td>
+							</tr>
+							<tr class="bangkhachhang">
+								<td>
+									<span class="tiude codeorder"> CT001002526 </span>
+									<p class="hienhan">
+										<span>Hạn: 30/04/2017</span>
+	                                     <span>Nguyễn Văn A</span>									
+									</p>
+								</td>
+								<td>
+									<span class="tiude"> Công ty xuất kẽm Danaweb </span>
+									<p class="bosungtiu">
+										<span>Mr.Captain American</span>
+	                                    <span>0987 654 321</span>									
+									</p>
+								</td>
+								<td>
+									
+									<p class="bosungtiu">
+									    <span> Name card</span>
+										<span>Brochure</span>
+	                                    <span>poster</span>									
+									</p>
+								</td>
+								<td>
+									<span class="tghoanhthanh">
+										Cần hoành thành trước 30/4
+									</span>
+									<span data-toggle="tooltip" class = "hienpopup" data-placement="right" title="" data-original-title="Xem ghi chú">
+									<i class="fa fa-file-text-o" aria-hidden="true" data-toggle="modal" data-target="#_calendar_modal" onclick="return add_calendar_modal();"  title="xem chi tiết chú thích"></i></span>
+								</td>
+								<td>
+								<select name="tech" class="tech form-control sectcustum1" id="tech2" style="padding-left: 20px;">
+									<option  value="Cho xuất kẽm" data-image="<?= HOME_URL;?>/images/hong.png">Cho xuất kẽm</option>
+									<option   selected="selected" value="Đang xuất kẽm" data-image="<?= HOME_URL;?>/images/xanh.png">Đang xuất kẽm</option>
+									<option value="Cho in" data-image="<?= HOME_URL;?>/images/lacay.png" name="cd">Cho in</option>
+							     </select>
+
+							    
+
+								</td>
+								<td>
+								  <div class="imea">
+								
+								<img src="<?= HOME_URL;?>/images/setinh.png" class="aoap">
+								<select  class=" form-control sectcustum3 set1">
+								  <option value="calendar" >&nbsp;</option>
+								  <option value="Nhân" selected="selected">Nhân</option>
+								  <option value="Hòa">Hòa</option>
+								  <option value="Thức" >Thức</option>
+								  <option value="Toàn">Toàn</option>
+								  <option value="Duyên">Duyên</option>
+								  <option value="Hà">Hà</option></select>
+								</select>
+								</div>
+								<ul class="hienxuly">	
+									<li class="dropdown">
+											<a data-toggle="dropdown" class="dropdown-toggle username" href="#">
+												<i class="fa fa-pencil" data-toggle="tooltip" data-placement="left" title="" data-original-title="Công cụ" ></i>
+												
+											</a>
+											<ul class="dropdown-menu extended logout nh_afterdrop">
+												<li><a href="/?ol=calendar&op=calendar_list"  data-toggle="tooltip" data-placement="left" title="" data-original-title="Xem chi tiết" ><i class="fa fa-file-text-o"></i> Xem chi tiết</a></li>
+												<li><a href="javascript:;"  data-toggle="tooltip" data-placement="left" title="" onclick="editcreen()" data-original-title="Chỉnh sửa"><i class="fa fa-paint-brush"></i> Chỉnh sửa</a></li>
+												<li class="divider"></li>
+												<li><a href="javascript:;"   data-toggle="tooltip" data-placement="left" title="" onclick="return open_calendar('manage', 1);" data-original-title="Lịch sử thực hiện" ><i class="fa fa-history"></i> Lịch sử </a></li>
+											<li><a href="javascript:;" class="xoahangngang"  data-toggle="tooltip" data-placement="left" title="" data-original-title="Xóa đơn hàng" ><i class="fa fa-trash-o"></i> Xóa </a></li>
+											</ul>
+									</li>
+								</ul>	
+								</td>
+							</tr>
+						</tbody>
+						
+					</table>
+					<?php }
+					else{ ?>
+					<table class="table table-no-border table-ol-3w table-hover">
+						<thead>
+						
+                        <tr class="panel-heading thantran" >
+								<th><label class="form-lb-tp">Code</label></th>
+								<th><label class="form-lb-tp">Khách hàng</label></th>
+								<th width="150px;"><label class="form-lb-tp">Đơn hàng</label></th>
+								<th width="200px;"><label class="form-lb-tp">Ghi chú</label></th>
+								<th><label class="form-lb-tp">Tình trạng</label></th>
+								<th><label class="form-lb-tp">Thực hiện</label></th>
+					   </tr>
+						</thead>
+						<tbody class="taplet">
+							<tr class="bangkhachhang">
+								<td>
+									<span class="hostcode codeorder"> CT001002526 </span>
+									<p class="hienhan">
+										<span>Hạn: 30/04/2017</span>
+	                                     <span>Nguyễn Văn A</span>									
+									</p>
+								</td>
+								<td>
+									<span class="tiude"> Công ty xuất kẽm Danaweb </span>
+									<p class="bosungtiu">
+										<span>Mr.Captain American</span>
+	                                    <span>0987 654 321</span>									
+									</p>
+								</td>
+								<td>
+									
+									<p class="bosungtiu">
+									    <span> Name card</span>
+										<span>Brochure</span>
+	                                    <span>poster</span>									
+									</p>
+								</td>
+								<td>
+									<span class="tghoanhthanh">
+										Cần hoành thành trước 30/4
+									</span>
+									<span data-toggle="tooltip" class = "hienpopup" data-placement="right" title="" data-original-title="Xem ghi chú">
+									<i class="fa fa-file-text-o" aria-hidden="true" data-toggle="modal" data-target="#_calendar_modal" onclick="return add_calendar_modal();"  title="xem chi tiết chú thích"></i></span>
+								</td>
+								<td>
+
+								<select name="tech" class="tech form-control sectcustum1" id="tech" style="padding-left: 20px;">
+								 <option value="Cho xuất kẽm" selected="selected" data-image="<?= HOME_URL;?>/images/hong.png">Cho xuất kẽm</option>
+							      <option   value="Đang xuất kẽm" data-image="<?= HOME_URL;?>/images/xanh.png">Đang xuất kẽm</option>
+							      <option value="Cho in"  data-image="<?= HOME_URL;?>/images/lacay.png" name="cd">Cho in</option>
+							       
+							    </select>
+                                
+								</td>
+								<td>
+									<div class="imea">
+								
+								<img src="<?= HOME_URL;?>/images/setinh.png" class="aoap">
+								<select  class=" form-control sectcustum3 set1">
+								   <option value="calendar" selected="selected" >&nbsp;</option>
+								  <option value="Nhân"  >Nhân</option>
+								  <option value="Hòa" >Hòa</option>
+								  <option value="Thức" >Thức</option>
+								  <option value="Toàn">Toàn</option>
+								  <option value="Duyên">Duyên</option>
+								  <option value="Hà">Hà</option></select>
+								</select>
+								</div>
+								<ul class="hienxuly">	
+									<li class="dropdown">
+											<a data-toggle="dropdown" class="dropdown-toggle username" href="#">
+												<i class="fa fa-pencil" data-toggle="tooltip" data-placement="left" title="" data-original-title="Công cụ" ></i>
+												
+											</a>
+											<ul class="dropdown-menu extended logout nh_afterdrop">
+												<li><a href="/?ol=calendar&op=calendar_list"  data-toggle="tooltip" data-placement="left" title="" data-original-title="Xem chi tiết" ><i class="fa fa-file-text-o"></i> Xem chi tiết</a></li>
+												<li><a href="javascript:;"  data-toggle="tooltip" data-placement="left" title="" onclick="editcreen()" data-original-title="Chỉnh sửa"><i class="fa fa-paint-brush"></i> Chỉnh sửa</a></li>
+												<li class="divider"></li>
+												<li><a href="javascript:;"   data-toggle="tooltip" data-placement="left" title="" onclick="return open_calendar('manage', 1);" data-original-title="Lịch sử thực hiện" ><i class="fa fa-history"></i> Lịch sử </a></li>
+											<li><a href="javascript:;" class="xoahangngang"  data-toggle="tooltip" data-placement="left" title="" data-original-title="Xóa đơn hàng" ><i class="fa fa-trash-o"></i> Xóa </a></li>
+											</ul>
+									</li>
+								</ul>	
+								</td>
+							</tr>
+							<tr class="bangkhachhang">
+								<td>
+									<span class="tiude codeorder"> CT001002526 </span>
+									<p class="hienhan">
+										<span>Hạn: 30/04/2017</span>
+	                                     <span>Nguyễn Văn A</span>									
+									</p>
+								</td>
+								<td>
+									<span class="tiude"> Công ty xuất kẽm Danaweb </span>
+									<p class="bosungtiu">
+										<span>Mr.Captain American</span>
+	                                    <span>0987 654 321</span>									
+									</p>
+								</td>
+								<td>
+									
+									<p class="bosungtiu">
+									    <span> Name card</span>
+										<span>Brochure</span>
+	                                    <span>poster</span>									
+									</p>
+								</td>
+								<td>
+									<span class="tghoanhthanh">
+										Cần hoành thành trước 30/4
+									</span>
+									<span data-toggle="tooltip" class = "hienpopup" data-placement="right" title="" data-original-title="Xem ghi chú">
+									<i class="fa fa-file-text-o" aria-hidden="true" data-toggle="modal" data-target="#_calendar_modal" onclick="return add_calendar_modal();"  title="xem chi tiết chú thích"></i></span>
+								</td>
+								<td>
+								<select name="tech" class="tech form-control sectcustum1" id="tech1" style="padding-left: 20px;">
+							      <option value="Cho xuất kẽm" data-image="<?= HOME_URL;?>/images/hong.png">Cho xuất kẽm</option>
+							      <option   value="Đang xuất kẽm" selected="selected" data-image="<?= HOME_URL;?>/images/xanh.png">Đang xuất kẽm</option>
+							      <option value="Cho in"  data-image="<?= HOME_URL;?>/images/lacay.png" name="cd">Cho in</option>
+							     </select>
+								
+								</td>
+								<td>
+								<div class="imea">
+								
+								<img src="<?= HOME_URL;?>/images/setinh.png" class="aoap">
+								<select  class=" form-control sectcustum3 set1">
+								  <option value="calendar" >&nbsp;</option>
+								  <option value="Nhân" >Nhân</option>
+								  <option value="Hòa" selected="selected">Hòa</option>
+								  <option value="Thức" >Thức</option>
+								  <option value="Toàn">Toàn</option>
+								  <option value="Duyên">Duyên</option>
+								  <option value="Hà">Hà</option></select>
+								</select>
+								</div>
+								<ul class="hienxuly">	
+									<li class="dropdown">
+											<a data-toggle="dropdown" class="dropdown-toggle username" href="#">
+												<i class="fa fa-pencil" data-toggle="tooltip" data-placement="left" title="" data-original-title="Công cụ" ></i>
+												
+											</a>
+											<ul class="dropdown-menu extended logout nh_afterdrop">
+												<li><a href="/?ol=calendar&op=calendar_list"  data-toggle="tooltip" data-placement="left" title="" data-original-title="Xem chi tiết" ><i class="fa fa-file-text-o"></i> Xem chi tiết</a></li>
+												<li><a href="javascript:;"  data-toggle="tooltip" data-placement="left" title="" onclick="editcreen()" data-original-title="Chỉnh sửa"><i class="fa fa-paint-brush"></i> Chỉnh sửa</a></li>
+												<li class="divider"></li>
+												<li><a href="javascript:;"   data-toggle="tooltip" data-placement="left" title="" onclick="return open_calendar('manage', 1);" data-original-title="Lịch sử thực hiện" ><i class="fa fa-history"></i> Lịch sử </a></li>
+											<li><a href="javascript:;" class="xoahangngang"  data-toggle="tooltip" data-placement="left" title="" data-original-title="Xóa đơn hàng" ><i class="fa fa-trash-o"></i> Xóa </a></li>
+											</ul>
+									</li>
+								</ul>	
+
+								</td>
+							</tr>
+							<tr class="bangkhachhang">
+								<td>
+									<span class="tiude codeorder"> CT001002526 </span>
+									<p class="hienhan">
+										<span>Hạn: 30/04/2017</span>
+	                                     <span>Nguyễn Văn A</span>									
+									</p>
+								</td>
+								<td>
+									<span class="tiude"> Công ty xuất kẽm Danaweb </span>
+									<p class="bosungtiu">
+										<span>Mr.Captain American</span>
+	                                    <span>0987 654 321</span>									
+									</p>
+								</td>
+								<td>
+									
+									<p class="bosungtiu">
+									    <span> Name card</span>
+										<span>Brochure</span>
+	                                    <span>poster</span>									
+									</p>
+								</td>
+								<td>
+									<span class="tghoanhthanh">
+										Cần hoành thành trước 30/4
+									</span>
+									<span data-toggle="tooltip" class = "hienpopup" data-placement="right" title="" data-original-title="Xem ghi chú">
+									<i class="fa fa-file-text-o" aria-hidden="true" data-toggle="modal" data-target="#_calendar_modal" onclick="return add_calendar_modal();"  title="xem chi tiết chú thích"></i></span>
+								</td>
+								<td>
+								<select name="tech" class="tech form-control sectcustum1" id="tech3" style="padding-left: 20px;">
+							     <option value="Cho xuất kẽm" data-image="<?= HOME_URL;?>/images/hong.png">Cho xuất kẽm</option>
+							      <option   value="Đang xuất kẽm" selected="selected" data-image="<?= HOME_URL;?>/images/xanh.png">Đang xuất kẽm</option>
+							      <option value="Cho in"  data-image="<?= HOME_URL;?>/images/lacay.png" name="cd">Cho in</option>
+							     </select>
+
+							    
+
+								</td>
+								<td>
+								<div class="imea">
+								
+								<img src="<?= HOME_URL;?>/images/setinh.png" class="aoap">
+								<select  class=" form-control sectcustum3 set1">
+								 <option value="calendar" >&nbsp;</option>
+								  <option value="Nhân" >Nhân</option>
+								  <option value="Hòa" >Hòa</option>
+								  <option value="Thức" >Thức</option>
+								  <option value="Toàn" selected="selected">Toàn</option>
+								  <option value="Duyên">Duyên</option>
+								  <option value="Hà">Hà</option></select>
+								</select>
+								</div>
+								<ul class="hienxuly">	
+									<li class="dropdown">
+											<a data-toggle="dropdown" class="dropdown-toggle username" href="#">
+												<i class="fa fa-pencil" data-toggle="tooltip" data-placement="left" title="" data-original-title="Công cụ" ></i>
+												
+											</a>
+											<ul class="dropdown-menu extended logout nh_afterdrop">
+												<li><a href="/?ol=calendar&op=calendar_list"  data-toggle="tooltip" data-placement="left" title="" data-original-title="Xem chi tiết" ><i class="fa fa-file-text-o"></i> Xem chi tiết</a></li>
+												<li><a href="javascript:;"  data-toggle="tooltip" data-placement="left" title="" onclick="editcreen()" data-original-title="Chỉnh sửa"><i class="fa fa-paint-brush"></i> Chỉnh sửa</a></li>
+												<li class="divider"></li>
+												<li><a href="javascript:;"   data-toggle="tooltip" data-placement="left" title="" onclick="return open_calendar('manage', 1);" data-original-title="Lịch sử thực hiện" ><i class="fa fa-history"></i> Lịch sử </a></li>
+											<li><a href="javascript:;" class="xoahangngang"  data-toggle="tooltip" data-placement="left" title="" data-original-title="Xóa đơn hàng" ><i class="fa fa-trash-o"></i> Xóa </a></li>
+											</ul>
+									</li>
+								</ul>	
+								</td>
+							</tr>
+								<tr class="bangkhachhang">
+								<td>
+									<span class="tiude codeorder"> CT001002526 </span>
+									<p class="hienhan">
+										<span>Hạn: 30/04/2017</span>
+	                                     <span>Nguyễn Văn A</span>									
+									</p>
+								</td>
+								<td>
+									<span class="tiude"> Công ty xuất kẽm Danaweb </span>
+									<p class="bosungtiu">
+										<span>Mr.Captain American</span>
+	                                    <span>0987 654 321</span>									
+									</p>
+								</td>
+								<td>
+									
+									<p class="bosungtiu">
+									    <span> Name card</span>
+										<span>Brochure</span>
+	                                    <span>poster</span>									
+									</p>
+								</td>
+								<td>
+									<span class="tghoanhthanh">
+										Cần hoành thành trước 30/4
+									</span>
+									<span data-toggle="tooltip" class = "hienpopup" data-placement="right" title="" data-original-title="Xem ghi chú">
+									<i class="fa fa-file-text-o " aria-hidden="true" data-toggle="modal" data-target="#_calendar_modal" onclick="return add_calendar_modal();"  title="xem chi tiết chú thích"></i>
+									</span>
+								</td>
+								<td>
+								<select name="tech" class="tech form-control sectcustum1" id="tech4" style="padding-left: 20px;">
+							     <option value="Cho xuất kẽm" data-image="<?= HOME_URL;?>/images/hong.png">Cho xuất kẽm</option>
+							      <option  selected="selected" value="Đang xuất kẽm" data-image="<?= HOME_URL;?>/images/xanh.png">Đang xuất kẽm</option>
+							      <option value="Cho in" data-image="<?= HOME_URL;?>/images/lacay.png" name="cd">Cho in</option>
+							      </select>
+								
+								</td>
+								<td>
+								<div class="imea">
+								
+								<img src="<?= HOME_URL;?>/images/setinh.png" class="aoap">
+								<select  class=" form-control sectcustum3 set1">
+								  <option value="calendar" >&nbsp;</option>
+								  <option value="Nhân" >Nhân</option>
+								  <option value="Hòa" >Hòa</option>
+								  <option value="Thức" >Thức</option>
+								  <option value="Toàn">Toàn</option>
+								  <option value="Duyên" selected="selected">Duyên</option>
+								  <option value="Hà">Hà</option></select>
+								</select>
+								</div>
+								<ul class="hienxuly">	
+									<li class="dropdown">
+											<a data-toggle="dropdown" class="dropdown-toggle username" href="#">
+												<i class="fa fa-pencil" data-toggle="tooltip" data-placement="left" title="" data-original-title="Công cụ" ></i>
+												
+											</a>
+											<ul class="dropdown-menu extended logout nh_afterdrop">
+												<li><a href="/?ol=calendar&op=calendar_list"  data-toggle="tooltip" data-placement="left" title="" data-original-title="Xem chi tiết" ><i class="fa fa-file-text-o"></i> Xem chi tiết</a></li>
+												<li><a href="javascript:;"  data-toggle="tooltip" data-placement="left" title="" onclick="editcreen()" data-original-title="Chỉnh sửa"><i class="fa fa-paint-brush"></i> Chỉnh sửa</a></li>
+												<li class="divider"></li>
+												<li><a href="javascript:;"   data-toggle="tooltip" data-placement="left" title="" onclick="return open_calendar('manage', 1);" data-original-title="Lịch sử thực hiện" ><i class="fa fa-history"></i> Lịch sử </a></li>
+											<li><a href="javascript:;" class="xoahangngang"  data-toggle="tooltip" data-placement="left" title="" data-original-title="Xóa đơn hàng" ><i class="fa fa-trash-o"></i> Xóa </a></li>
+											</ul>
+									</li>
+								</ul>	
+								</td>
+							</tr>
+								<tr class="bangkhachhang">
+								<td>
+									<span class="tiude codeorder"> CT001002526 </span>
+									<p class="hienhan">
+										<span>Hạn: 30/04/2017</span>
+	                                     <span>Nguyễn Văn A</span>									
+									</p>
+								</td>
+								<td>
+									<span class="tiude"> Công ty xuất kẽm Danaweb </span>
+									<p class="bosungtiu">
+										<span>Mr.Captain American</span>
+	                                    <span>0987 654 321</span>									
+									</p>
+								</td>
+								<td>
+									
+									<p class="bosungtiu">
+									    <span> Name card</span>
+										<span>Brochure</span>
+	                                    <span>poster</span>									
+									</p>
+								</td>
+								<td>
+									<span class="tghoanhthanh">
+										Cần hoành thành trước 30/4
+									</span>
+									<span data-toggle="tooltip" class = "hienpopup" data-placement="right" title="" data-original-title="Xem ghi chú">
+									<i class="fa fa-file-text-o" aria-hidden="true" data-toggle="modal" data-target="#_calendar_modal" onclick="return add_calendar_modal();"  title="xem chi tiết chú thích"></i></span>
+								</td>
+								<td>
+								<select name="tech" class="tech form-control sectcustum1" id="tech5" style="padding-left: 20px;">
+							      <option value="Cho xuất kẽm" data-image="<?= HOME_URL;?>/images/hong.png">Cho xuất kẽm</option>
+							      <option   value="Đang xuất kẽm" selected="selected" data-image="<?= HOME_URL;?>/images/xanh.png">Đang xuất kẽm</option>
+							      <option value="Cho in"  data-image="<?= HOME_URL;?>/images/lacay.png" name="cd">Cho in</option>
+							      </select>
+
+							    
+
+								</td>
+								<td>
+								<div class="imea">
+								
+								<img src="<?= HOME_URL;?>/images/setinh.png" class="aoap">
+								<select  class=" form-control sectcustum3 set1">
+								  <option value="calendar" >&nbsp;</option>
+								  <option value="Nhân" >Nhân</option>
+								  <option value="Hòa" >Hòa</option>
+								  <option value="Thức" >Thức</option>
+								  <option value="Toàn">Toàn</option>
+								  <option value="Duyên">Duyên</option>
+								  <option value="Hà" selected="selected">Hà</option></select>
+								</select>
+								</div>
+								<ul class="hienxuly">	
+									<li class="dropdown">
+											<a data-toggle="dropdown" class="dropdown-toggle username" href="#">
+												<i class="fa fa-pencil" data-toggle="tooltip" data-placement="left" title="" data-original-title="Công cụ" ></i>
+												
+											</a>
+											<ul class="dropdown-menu extended logout nh_afterdrop">
+												<li><a href="/?ol=calendar&op=calendar_list"  data-toggle="tooltip" data-placement="left" title="" data-original-title="Xem chi tiết" ><i class="fa fa-file-text-o"></i> Xem chi tiết</a></li>
+												<li><a href="javascript:;"  data-toggle="tooltip" data-placement="left" title="" onclick="editcreen()" data-original-title="Chỉnh sửa"><i class="fa fa-paint-brush"></i> Chỉnh sửa</a></li>
+												<li class="divider"></li>
+												<li><a href="javascript:;"   data-toggle="tooltip" data-placement="left" title="" onclick="return open_calendar('manage', 1);" data-original-title="Lịch sử thực hiện" ><i class="fa fa-history"></i> Lịch sử </a></li>
+											<li><a href="javascript:;" class="xoahangngang"  data-toggle="tooltip" data-placement="left" title="" data-original-title="Xóa đơn hàng" ><i class="fa fa-trash-o"></i> Xóa </a></li>
+											</ul>
+									</li>
+								</ul>	
+								</td>
+							</tr>
+						</tbody>
+
+						
+					</table>
+					<?php } ?>
+				</form>
+			</div>
+			<!-- /.table-responsive -->
+		</div>
+		<!-- /.panel -->
+	</div>
+	<!-- /.col-lg-6 -->
+</div>
+
+
+
+<script>
+
+ function editcreen(){
+	       window.location = "/?ol=calendar&op=calendar_tracking"
+ }
+
+function savescreen(){
+	window.location = "/?ol=calendar&op=calendar_list"
+}
+//Đổi trạng thái đơn hàng
+function doitrangthai() {
+	$("select.tech").change(function(e) {
+		
+		var trangthai = $("select.tech").val();
+		var tiude = $(this).parent().parent().parent().find('.codeorder').html();
+		
+		var han = 'Đơn hàng ' + tiude + ' : đã được chuyển sang ' + trangthai;
+		$.ajax({
+				url:'/action.php',
+				type: 'POST',
+				data: 'url=insert_message_notification&content='+han ,
+				
+				success: function(){
+					 showLoader();
+  			
+	        setTimeout(function(){
+			alert('Đã chuyển trạng thái thành công! Đơn hàng sẽ được chuyển sang ' + trangthai);
+			closeLoader();
+			}, 1000);
+					
+				}
+			});
+			
+	});
+}
+//Cho nhân viên thực hiện
+function giaonhanvien() {
+	$("select.set1").change(function(e) {
+		
+		var nhanvien = $("select.set1").val();
+		var tiude = $(this).parent().parent().parent().find('.codeorder').html();
+		
+		var han = (nhanvien != 'calendar')? 'Đơn hàng ' + tiude + ' : đã được chuyển cho nhân viên ' + nhanvien + ' của bộ phận xuất kẽm' : 'Đơn hàng ' + tiude + ' : cần chuyển cho nhân viên khác của bộ phận xuất kẽm.';
+		$.ajax({
+				url:'/action.php',
+				type: 'POST',
+				data: 'url=insert_message_notification&content='+han ,
+				
+				success: function(){
+					 showLoader();
+  			
+	        setTimeout(function(){
+			alert('Đã giao việc thành công ' );
+			closeLoader();
+			}, 1000);
+					
+				}
+			});
+			
+	});
+}
+
+function loadtable(url){
+	alert(url)
+}
+
+$(document).ready(function() {
+  $('.sectcustum3').niceSelect();
+});
+$(document).ready(function(e) {
+	$("#payments").msDropdown({visibleRows:4});
+	$(".tech").msDropdown().data("dd");//{animStyle:'none'} /{animStyle:'slideDown'} {animStyle:'show'}		
+	//no use
+	try {
+		var pages = $("#pages").msDropdown({on:{change:function(data, ui) {
+												var val = data.value;
+												if(val!="")
+													window.location = val;
+											}}}).data("dd");
+
+		var pagename = document.location.pathname.toString();
+		pagename = pagename.split("/");
+		pages.setIndexByValue(pagename[pagename.length-1]);
+		$("#ver").html(msBeautify.version.msDropdown);
+	} catch(e) {
+		//console.log(e);	
+	}
+	
+	$("#ver").html(msBeautify.version.msDropdown);
+	doitrangthai();
+	giaonhanvien();
+});
+
+$('.danhsachdonhangcanhan').on('click','.xoahangngang',function(){
+
+    var n  = $(this)
+
+ confirm("Tất cả các dữ liệu liên quan sẽ được xóa và không thể phục hồi.\nBạn có muốn thực hiện không?", function() {
+    if(this.data == true){
+       showLoader()
+     
+         setTimeout(function(){
+         n.parent().parent().parent().parent().parent().parent().remove();
+   alert('Bạn đã xóa dữ liệu thành công')
+   closeLoader()
+   }, 1000);
+          }
+          else{}
+    }) 
+
+  
+    });
+
+	$(document).ready(function() {
+		$('#dataTablesList tfoot th').each( function () {
+			var title = $(this).text();
+			$(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+		} );
+		var table = $('#dataTablesList').DataTable( {
+			"language": {
+				"url": "/js/data-tables/de_DE.txt"
+			},
+			"lengthMenu": [[30, 50, 80, 100], [30, 50, 80, 100]],
+			"info":     false,
+			"processing": true,
+			"serverSide": true,
+			"ajax": {
+				url: '/action.php?url=document_list',
+				type: 'POST'
+			},
+			"fnRowCallback" : function(nRow, aData, iDisplayIndex) {
+				$('td:eq(0)', nRow).css( "text-align", "center" );
+				$('td:eq(4)', nRow).css( "text-align", "center" );
+				$('td:eq(5)', nRow).css( "text-align", "center" );
+				$('td:eq(6)', nRow).css( "text-align", "center" );
+				$('td:eq(7)', nRow).css( "text-align", "center" );
+				return nRow;
+			},
+			"order": [[ 0, "desc" ]],
+			"aoColumnDefs" : [ {
+				'targets': [6, 7],
+				'searchable':false,
+				'orderable':false
+			} ]
+		});
+		// Apply the search
+		/*table.columns().eq( 0 ).each( function () {
+			$( 'input.filter' ).on( 'keyup change', function () {
+				var i =$(this).attr('data-column');
+				var v =$(this).val();
+				table.columns(i).search(v).draw();
+			});
+			$( 'select.filter' ).on( 'change', function () {   // for select box
+				var i =$(this).attr('data-column');
+				var v =$(this).val();
+				table.columns(i).search(v).draw();
+			} );
+		} ); */
+	});
+	$('.input-date').datetimepicker({
+		lang:'vi',
+		timepicker: false,
+		closeOnDateSelect:true,
+		format:'<?php echo TTH_DATE_FORMAT;?>'
+	});
+	$(".ol-confirm").click(function() {
+		confirm("Tất cả các dữ liệu liên quan sẽ được xóa và không thể phục hồi.\nBạn có muốn thực hiện không?", function() {
+			if(this.data == true) document.getElementById("_ol_delete").submit();
+		});
+	});
+	$(".ol-alert-core").boxes('alert', 'Bạn không được phân quyền với chức năng này.');
+</script>

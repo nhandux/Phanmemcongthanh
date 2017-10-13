@@ -1,0 +1,161 @@
+<?php
+if (!defined('TTH_SYSTEM')) {die('Please stop!');}
+//
+?>
+
+<!-- Menu path -->
+<!-- <div class="row">
+	<div class="col-md-12">
+		<ul class="breadcrumbs-alt">
+			<li>
+				<a href="/"><?php echo $menu_ol[0];?></a>
+			</li>
+			<li>
+				<a><?php echo $menu_ol[6];?></a>
+			</li>
+			<li>
+				<a class="current"><?php echo $menu_op[6][1];?></a>
+			</li>
+		</ul>
+	</div>
+</div> -->
+<!-- /.row -->
+<?php
+if (isset($_POST['update'])) {
+
+	function updateConstant($constant, $value) {
+		global $db;
+		$db->table = "constant";
+		$data      = array(
+			'value' => $db->clearText($value)
+		);
+		$db->condition = "constant = '".$constant."'";
+		$db->update($data);
+	}
+
+	$nameConstant  = $_POST["name_constant"];
+	$countConstant = count($nameConstant);
+	$valueConstant = $_POST["value_constant"];
+	for ($i = 0; $i < $countConstant; $i++) {
+		updateConstant($nameConstant[$i], $valueConstant[$i]);
+	}
+}
+?>
+<div class="row">
+	<div class="col-lg-12 col-md-12">
+		<div class="panel">
+			<div class="panel-heading">
+				<i class="<?php echo $icon_ol[6];?> fa-fw"></i> Đề xuất
+				<span class="tools pull-right">
+		            <a href="javascript:;" class="fa fa-spinner fa-spin"></a>
+		            <a href="javascript:;" class="fa fa-chevron-down"></a>
+		            <a href="javascript:;" class="fa fa-eye"></a>
+		            <a href="javascript:;" class="fa fa-compress"></a>
+		            <a href="javascript:;" class="fa fa-times"></a>
+	            </span>
+			</div>
+			<div class="panel-body">
+				<div class="form-responsive row  chucnangsaoluu">
+					<form action="<?php echo TTH_PATH_LK.$link_ol[6].TTH_PATH_OP_LK.$link_op[6][1]?>" method="post" class="form-ol-3w frmdexuat ">
+						<div class="owrdexuat">
+							<div class="listdexuat">
+								<div class="col-md-2"><span>Tên loại đề xuất <span class="thutu">(1)</span></span></div>
+								<div class="col-md-4">
+									 <div class="xulyselectdexuat">
+										<input type="text" id="nhanselect"  class="nhanselect form-control sanphamtype" onclick="chonse('locselect')" onkeyup="chonselect('nhanselect','locselect')" placeholder="Chọn sản phẩm... " title="chọn sản phẩm..." autocomplete="off" required="">
+				                        <span class="caret caretcustumnhan" ></span>
+										<ul id="locselect" class="locselect locdexuat">
+											 <li><a href="javascript:{0}" value="Poster">Poster</a></li>
+										     <li><a href="javascript:{0}" value="Banner">Banner</a></li>
+											 <li><a href="javascript:{0}" value="Catalogue-Brochure">Catalogue-Brochure</a></li>
+											 <li><a href="javascript:{0}" value="Set doanh nghiệp">Set doanh nghiệp</a></li>
+											 <li><a href="javascript:{0}" value="Sách báo-tạp chí">Sách báo-tạp chí</a></li>
+											 <li><a href="javascript:{0}" value="Phiếu-vé-hóa đơn">Phiếu-vé-hóa đơn</a></li>
+											 <li><a href="javascript:{0}" value="Bao bì-hộp giấy">Bao bì-hộp giấy</a></li>
+											 <li><a href="javascript:{0}" value="Lịch-thiệp">Lịch-thiệp</a></li>
+											 <li><a href="javascript:{0}" value="resort-nhà hàng">resort-nhà hàng</a></li>
+											 <li><a href="javascript:{0}" value="Profile">Profile</a></li>
+										</ul>
+				                     </div>
+								</div>
+								<div class="col-md-2"><span>Số lượng đề xuất <span class="thutu">(1)</span></span></div>
+								<div class="col-md-4"><input type="text" class="form-control auto-number"  type="text" name="quan"  value=""  data-a-sep="." data-a-dec="," data-v-max="99999999999" data-v-min="0" placeholder="Số lượng"  autocomplete="off" required ></div>
+							</div>
+                        </div>
+
+						<script type="text/javascript">
+						$('.chucnangsaoluu').on('click', '.locdexuat li', function(event) {
+							a = $(this).parent().attr('id')
+							$('#'+a).css('display','none')
+
+							 gtsl = $(this).find('a').attr('value')
+
+							 b = $(this).parent().attr('value')
+
+
+							$('#'+b).val(gtsl)
+							$('#'+a+' li a').removeClass('activeslect')
+							$(this).find('a').addClass('activeslect')
+						});
+
+						function chonselect(a,b) {
+							    var input, filter, ul, li, a, i;
+							    input = document.getElementById(a);
+							    filter = input.value.toUpperCase();
+							    ul = document.getElementById(b);
+							    li = ul.getElementsByTagName("li");
+							    for (i = 0; i < li.length; i++) {
+							        a = li[i].getElementsByTagName("a")[0];
+							        if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
+							            li[i].style.display = "";
+							        } else {
+							            li[i].style.display = "none";
+
+							        }
+							    }
+							}
+							function chonse(a){
+								 $('#'+ a).css('display','block')
+								}
+
+							$('#locselect li a').on('click', function(event) {
+
+							$('#locselect').css('display','none')
+							 gtsl = $(this).attr('value')
+							$('#nhanselect').val(gtsl)
+							$('#locselect li a').removeClass('activeslect')
+							$(this).addClass('activeslect')
+						});
+
+						</script>
+							<div class="col-md-12 col-sm-12 col-xs-12 chuanutconfig">
+
+							<button class="btn btn-round color-1 material-design nuthemmuc themdexuat"   type="button" name="update"  style="margin-top: 0px;"  data-color="#004740" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Thêm đề xuất"><i class="fa fa-plus" ></i> <span>Thêm đề xuất</span></button>
+
+							<button class="btn btn-round color-1 material-design nuthemmuc nutlammoi"  type="submit"  style="margin-top: 0px;"  data-color="#004740" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Gửi đề xuất "><i class="fa fa-send" ></i> <span>Gửi đề xuất</span></button>
+
+							<button class="btn btn-round color-1 material-design nuthemmuc saoluudulieu"  onclick="location.href='/'"  style="margin-top: 0px;" data-color="#004740" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Thoát khỏi đề xuất"><i class="fa fa-reply" ></i> <span>Thoát</span></button>
+
+							</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+i = 1;
+	$('.themdexuat').click(function(event) {
+		i = i + 1;
+		locselect1 = "'locselect"+i+"'"
+
+		locselect = "locselect" + i
+
+		nhanselect1 = "'nhanselect"+i+"'"
+
+		nhanselect = "nhanselect" + i
+
+        $('.owrdexuat').append('<div class="listdexuat"><div class="col-md-2"><span>Tên loại đề xuất <span class="thutu">('+i+')</span></span></div><div class="col-md-4"><div class="xulyselectdexuat"><input type="text" id="'+nhanselect+'"  class="nhanselect form-control sanphamtype"  placeholder="Chọn sản phẩm... " title="chọn sản phẩm..." autocomplete="off" onclick="chonse('+locselect1+')"  onkeyup="chonselect('+nhanselect1+','+locselect1+')" required> <span class="caret caretcustumnhan" ></span><ul  id="'+ locselect+'" class="locselect locdexuat  " value="'+nhanselect+'"><li><a href="javascript:{0}" value="Poster">Poster</a></li><li><a href="javascript:{0}" value="Banner">Banner</a></li><li><a href="javascript:{0}" value="Catalogue-Brochure">Catalogue-Brochure</a></li><li><a href="javascript:{0}" value="Set doanh nghiệp">Set doanh nghiệp</a></li><li><a href="javascript:{0}" value="Sách báo-tạp chí">Sách báo-tạp chí</a></li><li><a href="javascript:{0}" value="Phiếu-vé-hóa đơn">Phiếu-vé-hóa đơn</a></li><li><a href="javascript:{0}" value="Bao bì-hộp giấy">Bao bì-hộp giấy</a></li><li><a href="javascript:{0}" value="Lịch-thiệp">Lịch-thiệp</a></li><li><a href="javascript:{0}" value="resort-nhà hàng">resort-nhà hàng</a></li> <li><a href="javascript:{0}" value="Profile">Profile</a></li></ul></div></div><div class="col-md-2"><span>Số lượng đề xuất <span class="thutu">('+i+')</span></span></div><div class="col-md-4"><input type="text" class="form-control auto-number"  type="text" name="quan"  data-a-sep="." data-a-dec="," data-v-max="99999999999" data-v-min="0" placeholder="Số lượng"  autocomplete="off" required ></div></div>')
+
+	});
+</script>

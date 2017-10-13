@@ -1,0 +1,178 @@
+<?php
+if (!defined('TTH_SYSTEM')) {die('Please stop!');}
+//
+if (isset($_POST['open'])) {
+	$list_title    = $list_level    = $list_address    = array();
+	$db->table     = "jobs_name";
+	$db->condition = "is_active = 1";
+	$db->order     = "sort ASC";
+	$db->limit     = "";
+	$rows          = $db->select('title');
+	if ($db->RowCount > 0) {
+		$i = 0;
+		foreach ($rows as $row) {
+			$list_title[$i] = stripslashes($row['title']);
+			$i++;
+		}
+	}
+	$list_title = implode('&quot;,&quot;', $list_title);
+
+	$list_title = '&quot;'.$list_title.'&quot;';
+
+	//--------------------
+	$db->table     = "level";
+	$db->condition = "is_active = 1";
+	$db->order     = "sort ASC";
+	$db->limit     = "";
+	$rows          = $db->select();
+	if ($db->RowCount > 0) {
+		$i = 0;
+		foreach ($rows as $row) {
+			$list_level[$i] = '<option value="'.$row['level_id'].'" data-content="<span class=\'lb-level '.stripslashes($row['class']).'\'>'.stripslashes($row['title']).'</span>">'.stripslashes($row['title']).'</option>';
+			$i++;
+		}
+	}
+	//--------------------
+	$db->table     = "jobs_address";
+	$db->condition = "is_active = 1";
+	$db->order     = "sort ASC";
+	$db->limit     = "";
+	$rows          = $db->select('title');
+	if ($db->RowCount > 0) {
+		$i = 0;
+		foreach ($rows as $row) {
+			$list_address[$i] = stripslashes($row['title']);
+			$i++;
+		}
+	}
+	$list_address = implode('&quot;,&quot;', $list_address);
+
+	$list_address = '&quot;'.$list_address.'&quot;';
+
+	?>
+	<div class="modal-dialog">
+			<form id="_form_calendar" method="post" onsubmit="return add_calendar('_form_calendar', 'calendar_add');" enctype="multipart/form-data">
+				<div class="modal-content">
+					<div class="modal-header personal">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="myModalLabel"><i class="fa fa-calendar"></i> &nbsp;Ghi chú danh sách</h4>
+					</div>
+					<div class="modal-body">
+						<div class="form-responsive">
+							<table class="table table-no-border table-ol-3w table-hover tabnhan" style="max-width: 500px;">
+							<tr><td colspan="2" style="padding:5px;">
+								<span class="hienthi">Tổng số :</span>  <span class="soluongtinnhan" > 9 </span> Ghi chú
+							</td></tr>
+							<tr>
+								<td colspan="2">
+									<div class="contentnote">
+										<span class="kytuad">TK : </span>Làm nhanh dùm tôi nhé <small><i class="fa fa-clock-o"></i> 12:23 - 12/05/2017</small>.<br/>
+										<span class="kytuad">GĐ : </span>Cái này chưa xong lun à triển khai nhanh giúp <small> <i class="fa fa-clock-o"></i>12:23 - 12/05/2017</small>.<br/>
+										<span class="kytuad">IN : </span>Cái này đang tiếp tục triên khai <small><i class="fa fa-clock-o"></i> 12:23 - 12/05/2017</small>.<br/>
+										<span class="kytuad">TK : </span>Làm nhanh dùm tôi nhé <small><i class="fa fa-clock-o"></i> 12:23 12/05/2017</small>.<br/>
+										<span class="kytuad">GĐ : </span>Cái này chưa xong lun à triển khai nhanh giúp <small><i class="fa fa-clock-o"></i> 12:23 - 12/05/2017</small>.<br/>
+										<span class="kytuad">IN : </span>Cái này đang tiếp tục triên khai <small><i class="fa fa-clock-o"></i> 12:23 - 12/05/2017</small>.<br/>
+										<span class="kytuad">TK : </span>Làm nhanh dùm tôi nhé <small><i class="fa fa-clock-o"></i> 12:23 - 12/05/2017</small>.<br/>
+										<span class="kytuad">GĐ : </span>Cái này chưa xong lun à triển khai nhanh giúp <small><i class="fa fa-clock-o"></i> 12:23 - 12/05/2017</small>.<br/>
+										<span class="kytuad">IN : </span>Cái này đang tiếp tục triên khai <small><i class="fa fa-clock-o"></i> 12:23 - 12/05/2017</small>.<br/>
+									</div>
+								</td>
+							</tr>
+							<tr>
+									<td width="120px"><label class="form-lb-tp">Ghi chú:</label></td>
+									<td><textarea class="form-control" type="text" name="title" id="noidungtinnhan" maxlength="250"  required="required" autocomplete="off" rows="4"></textarea></td>
+							</tr>
+							<tr>
+
+							</tr>
+
+							</table>
+						</div>
+					</div>
+					<div class="modal-footer">
+					<button class="btn btn-round color-1 material-design   btn-nhan" id="guichuthich" type="button" name="login_admin" data-color="#004740"><i class="fa fa-send" ></i> <span>Gửi</span></button>
+
+					</div>
+				</div>
+			</form>
+			<script>
+
+			function scrolltop(){
+				 var wtf = $('.contentnote');
+			    var height = wtf[0].scrollHeight;
+			    wtf.scrollTop(height);
+			}
+			 scrolltop()
+			 i = 9;
+	         $('#guichuthich').click(function(event) {
+	         	/* Act on the event */
+	         	han = $('#noidungtinnhan').val()
+	             if(han !=""){
+
+	             	var mydate=new Date();
+					var year=mydate.getYear();
+					if (year < 1000) year+=1900;
+					var day=mydate.getDay();
+					var month=mydate.getMonth();
+					var daym=mydate.getDate();
+					if (daym<10) daym="0"+daym;
+					var montharray=new Array("/1","/2","/3","/4","/5","/6","/7","/8","/9","/10","/11","/12");
+					var ngayh = daym + montharray[month]+'/'+year
+
+				    var h = mydate.getHours();
+				    var m = mydate.getMinutes();
+	                  if(h < 10 )
+	                  	h = '0' + h
+	                  if(m < 10 )
+	                  	m = '0' + m
+
+				    var giay = h+':'+m
+
+	         	$('.contentnote').append('<span class="kytuad">GĐ : </span> '+han+' <small><i class="fa fa-clock-o"></i> '+giay +' - '+ngayh+'</small>.<br/>')
+	         	 scrolltop()
+
+	             i = i + 1
+
+	       $('.soluongtinnhan').text(i)
+	            $('#noidungtinnhan').val("")
+	            }else{
+
+	            }
+	            $('#noidungtinnhan').focus()
+
+	         });
+
+				$('.selectpicker').selectpicker();
+				$('.file').fileinput();
+				jQuery(function(){
+					$('#time_start').datetimepicker({
+						format:'d/m/Y H:i',
+						lang:'vi',
+						onShow:function( ct ){
+							this.setOptions({
+								minDate:false,
+								maxDate:$('#time_end').val()?$('#time_end').val():false,
+								format:'d/m/Y H:i',
+								formatDate:'d/m/Y H:i'
+							})
+						}
+					});
+					$('#time_end').datetimepicker({
+						format:'d/m/Y H:i',
+						lang:'vi',
+						onShow:function( ct ){
+							this.setOptions({
+								minDate:$('#time_start').val()?$('#time_start').val():false,
+								maxDate:false,
+								format:'d/m/Y H:i',
+								formatDate:'d/m/Y H:i'
+							})
+						}
+					});
+				});
+			</script>
+		</div>
+	<?php
+} else {
+	echo 'Error--';
+}

@@ -1,0 +1,99 @@
+<?php
+if (!defined('TTH_SYSTEM')) { die('Please stop!'); }
+//
+?>
+
+<!-- Menu path -->
+<div class="row">
+	<div class="col-md-12">
+		<ul class="breadcrumbs-alt">
+			<li>
+				<a href="/"><?php echo $menu_ol[0];?></a>
+			</li>
+			<li>
+				<a><?php echo $menu_ol[5];?></a>
+			</li>
+			<li>
+				<a class="current"><?php echo $menu_op[5][1];?></a>
+			</li>
+		</ul>
+	</div>
+</div>
+<!-- /.row -->
+<?php
+if(isset($_POST['update'])) {
+	function updateConstant ($constant, $value) {
+		global $db;
+		$db->table = "constant";
+		$data =array(
+			'value'=>$db->clearText($value)
+		);
+		$db->condition = "constant = '".$constant."'";
+		$db->update($data);
+	}
+
+	//updateConstant("backup_auto",$_POST['backup_auto']);
+	updateConstant("backup_filetype",$_POST['backup_filetype']);
+	updateConstant("backup_filecount",$_POST['backup_filecount']);
+	updateConstant("backup_email",$_POST['backup_email']);
+	loadPageSuccess("Đã cập nhật thông tin cấu hình thành công.", TTH_PATH_LK . $link_ol[5] . TTH_PATH_OP_LK . $link_op[5][1]);
+}
+?>
+<div class="row">
+	<div class="col-lg-12 col-md-12 col-xs-12">
+		<div class="panel">
+			<div class="panel-heading">
+				<i class="<?php echo $icon_ol[7];?> fa-fw"></i> <?php echo $menu_op[5][1];?>
+				<span class="tools pull-right">
+		            <a href="javascript:;" class="fa fa-spinner fa-spin"></a>
+		            <a href="javascript:;" class="fa fa-chevron-down"></a>
+		            <a href="javascript:;" class="fa fa-eye"></a>
+		            <a href="javascript:;" class="fa fa-compress"></a>
+		            <a href="javascript:;" class="fa fa-times"></a>
+	            </span>
+			</div>
+			<div class="panel-body">
+				<div class="form-responsive row chucnangsaoluu">
+					<form action="<?php echo TTH_PATH_LK . $link_ol[7] . TTH_PATH_OP_LK . $link_op[7][1];?>" method="post">
+						
+								<div  class="col-md-3 col-sm-6 col-xs-12"><label class="form-lb-tp">Tự động sao lưu:</label></div>
+								<div class="col-md-3 col-sm-6 col-xs-12">  
+									<select disabled name="backup_auto" class="form-control ">
+										<option value="none" <?=(getConstant("backup_auto")=='none')? "selected" : "" ?> >Không</option>
+										<option value="day" <?=(getConstant("backup_auto")=='day')? "selected" : "" ?> >Hằng ngày</option>
+										<option value="week" <?=(getConstant("backup_auto")=='week')? "selected" : "" ?> >Hằng tuần</option>
+										<option value="month" <?=(getConstant("backup_auto")=='month')? "selected" : "" ?> >Hằng tháng</option>
+									</select>
+								</div>
+							<div class="col-md-3 col-sm-6 col-xs-12"><label class="form-lb-tp">Định dạng lưu file CSDL:</label></div>
+							<div class="col-md-3 col-sm-6 col-xs-12"> 	
+									<select name="backup_filetype" class="form-control selectconfig">
+										<option value="sql" <?=(getConstant("backup_filetype")=='sql')? "selected" : "" ?> >.sql</option>
+										<option value="sql.gz" <?=(getConstant("backup_filetype")=='sql.gz')? "selected" : "" ?> >.gz</option>
+									</select>
+								</div>
+							<div class="col-md-3 col-sm-6 col-xs-12"> <label class="form-lb-tp">Số file CSDL lưu lại:</label></div>
+							<div class="col-md-3 col-sm-6 col-xs-12"> <input class="form-control auto-number" type="text" maxlength="3" data-a-sep="" data-v-max="999" data-v-min="0" name="backup_filecount" onclick="this.select();" value="<?=(getConstant("backup_filecount")+0==0) ? 1 : getConstant("backup_filecount") ?>"></div>
+							<div class="col-md-3 col-sm-6 col-xs-12"> <label class="form-lb-tp">Email nhận thông báo và file:</label><br></div>
+								<div class="col-md-3 col-sm-6 col-xs-12">
+								 <input class="form-control" type="email" maxlength="200" name="backup_email" onclick="this.select();" value="<?=getConstant("backup_email")?>" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Để rổng nếu muốn không gửi"></div>
+							<div class="col-md-12 col-sm-12 col-xs-12 chuanutconfig"> 
+
+							<button class="btn btn-round color-1 material-design nuthemmuc"  type="submit" name="update"  style="margin-top: 0px;"  data-color="#004740" data-toggle="tooltip" data-placement="top" title="" data-original-title="Lưu thiết lập"><i class="fa fa-save" ></i> <span>Lưu lại</span></button>
+
+							<button class="btn btn-round color-1 material-design nuthemmuc nutlammoi"  type="reset"  style="margin-top: 0px;"  data-color="#004740" data-toggle="tooltip" data-placement="top" title="" data-original-title="Làm mới "><i class="fa fa-recycle" ></i> <span>Nhập lại</span></button>
+
+							<button class="btn btn-round color-1 material-design nuthemmuc saoluudulieu"  onclick="location.href='/'"  style="margin-top: 0px;" data-color="#004740" data-toggle="tooltip" data-placement="top" title="" data-original-title="Thoát khỏi cấu hình"><i class="fa fa-reply" ></i> <span>Thoát</span></button>
+
+							</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	$(document).ready(function() {
+	  $('.selectconfig').niceSelect();
+	});
+</script>

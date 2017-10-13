@@ -1,0 +1,10 @@
+@font-face {
+	font-family: "DanaWeb";
+	src: url("sigma-five0.eot");
+	src: url("sigma-five0.eot#iefix") format("embedded-opentype"),
+	url("sigma-five0.woff") format("woff"),
+	url("sigma-five0.ttf") format("truetype"),
+	url("sigma-five0.svg") format("svg");
+	font-weight: normal;
+	font-style: normal;
+}
